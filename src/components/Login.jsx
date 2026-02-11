@@ -57,7 +57,7 @@ const Login = () => {
             </div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 transition-colors">ELEGANCE</h1>
             <p className="text-xs text-slate-600 dark:text-slate-400 uppercase tracking-widest transition-colors">Payment System</p>
-            <p className="text-sm text-slate-600 dark:text-slate-500 mt-2 transition-colors">Sign in to access your dashboard</p>
+            <p className="text-sm text-slate-600 dark:text-slate-500 mt-2 transition-colors">Sign in to access your Portal</p>
           </div>
 
           {/* Error Message */}
@@ -133,7 +133,7 @@ const Login = () => {
           </form>
 
           {/* Register Link */}
-          <div className="mt-6 text-center">
+          {/* <div className="mt-6 text-center">
             <p className="text-sm text-slate-600 dark:text-slate-400 transition-colors">
               Don't have an account?{' '}
               <Link
@@ -143,7 +143,7 @@ const Login = () => {
                 Sign up
               </Link>
             </p>
-          </div>
+          </div> */}
 
           {/* Footer */}
           <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center transition-colors">
