@@ -50,7 +50,7 @@ const Login = () => {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 mb-4 p-3">
               <img 
-                src="/ec-logo.png"
+                src="/icon_bank/ec-logo.png"
                 alt="ELEGANCE Logo"
                 className="w-full h-full object-contain"
               />
