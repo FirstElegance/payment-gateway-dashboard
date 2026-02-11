@@ -1,0 +1,185 @@
+[
+    {
+        "id": 5,
+        "bankCode": "004",
+        "serviceCode": "API_PAYMENT",
+        "config": {
+            "key": "-----BEGIN PRIVATE KEY-----MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCvZ99EpWVi6+cvhYhjgHQ0Vgq49gQJ9nr5Y3UaRMYrhqyOUdELQSH8Z5TU0SgIbyIS8aXb0bL3TszDDHIoYOTFJJXzgNGhgtyG3LbZ9T5GjM2wat4zPY+CMlWQsCTuf2vPHZm3A2Pcq5VCFH1twYIbxyVd5jUE8NKdTxpJsHX5H7dNTaY38uEF8JICZdo4uUOFFm33e19lTH5pt/F7zfth+G8kHbsWPFONoE9lpqHaFd549560I+zMa+ZTnxuF373QVeYPAvg6I1xyfSYIoYjUtffcMW/WQYZFKeErWgOXKw9j5BCiyus4LWwa9noeSJZr4hwk3Ts/Olb51fOKHC0tAgMBAAECggEAHcX7pa8Oc9lXm18m7L7V2rldJhKqUleafaD2dGBGpAY+3YSBP5ANeQbLAknDahUVG1KVxOeGIYjoZFZFPVnfEyCX7GaKDsiD7sdhqUMB0F9fnamyME/rf13UXNQtXKdX0Sb029YROhiM5BPOy5XMZDMsQlFMYBuRoH6YF3iCueeyBOaPy6vm+owm4dHiZupvVkVewI1V0LAmNco/UuhnCJIWLCvNLvaaY1ASNBEgvRIaECKJKfecWb4ZzuOk5RZ71TKFEanHsYpqYIe1FIEGCIVnJ/qAxZqrBI/2teOJlSuUDJ/Dw6Y65p/Wq+i/nO+DH7q0V2QwOBSUmu1sG7q8SQKBgQDwiKT5Qw8u+ex9KZruK0Jj3QCsoVXv7E88X3Z+NpUMhdYephtVszQcxlkm/EqIUO5cUrLwOd71Y9KjNAXcn+sbkxmXt+GQdazDk3/amYTjaMil0LD6q0V1FRHA0xD+eTZVm9skDKTfHDbC8S1WAMFYxnxs7DMQ1lUCmEpF95bfxQKBgQC6ryyyCXyxS192CUe9A2fgALbGcP6Qa67Wpvw4LP2PuEtr0dnucGy4UcCqPaOsiumokFre2bVnxZshfY+Yx+dYfw43fvadyc+tALODXJtzl5VxLCXDqAO12EWpkVhx6TOBWumZv4sCTapmr2Htn2F8qToen8FsXSzoGBx2TzTGSQKBgQDHJvwg/ar2pCtwPiBvDhY8BOHoDPTQX4IDZK8BNUQXSEDOw41iWavOH1P1eXJkh02z1y0cxW2bE3l1cz9fOnE5NYQ9IBx8tVHD5L45Sl7CwyFOWQoPofsyQ62dT6SEbevU2eSJZoajzAJzSajVym5LiJvAu5hUWoGsUlc8sxCSWQKBgQCT2x4pPD5YJXxL/nmlCEeDMM2SSfg05jSpqcPlsix5YdvKX4CdyskxCv7vVraFd9gsO3jdO8zjjayaT9olhV6Dxs25woMM4cPsH7wN9JDiclJYOkEGv9GAevRhos5MGglDEIAn137/qgemII4NJ8iMdXOkwZ7udrWUdVRFl+ISkQKBgEZTxR71jfKOT6wZYX2YDesu8rEdv5dnC9OkDmsveh6iE6mEGMPUmI8Qoik+wMPY+h7M2k4eA4W7Eb/FVqr9/hCol9TgyQ8LrP5mlrQaoqt/na272mAHapLqI9JyZvWPLrnhkbMA7XtyNcUl5NucmfcjNG0dkT4y4DSYDada342m-----END PRIVATE KEY-----",
+            "cert": "-----BEGIN CERTIFICATE-----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-----END CERTIFICATE-----",
+            "urlToken": "https://openapi.kasikornbank.com/v2/oauth/token",
+            "bodyToken": "grant_type=client_credentials",
+            "consumerId": "dzS74Xq8PogolArXULKGlVT1uIZNmAlY",
+            "merchantID": "CSGD",
+            "senderName": "CLASSIC GOLD COMPANY LIMITED",
+            "senderTaxID": "No",
+            "fromAccountNo": "1998059700",
+            "consumerSecret": "3HiwcBVb0Z9XMdJE",
+            "fundTransferUrl": "https://openapi.kasikornbank.com/v1/fundtransfer/fundtransfer",
+            "inquiryAccountUrl": "https://openapi.kasikornbank.com/v1/fundtransfer/verifydata"
+        },
+        "createdAt": "2025-12-08T15:04:16.878Z",
+        "updatedAt": "2025-12-08T15:04:16.878Z"
+    },
+    {
+        "id": 2,
+        "bankCode": "014",
+        "serviceCode": "BILL_PAYMENT",
+        "config": {
+            "urlToken": "https://api-sandbox.partners.scb/partners/sandbox/v1/oauth/token",
+            "merchantInfo": [
+                {
+                    "ppId": "999594939303236",
+                    "sufix": "36",
+                    "taxId": "9995949393032",
+                    "initial": "BSV",
+                    "billerId": "999594939303236",
+                    "branchName": "ซื้อทอง",
+                    "merchantId": "924184309216665",
+                    "bankAccount": "xxxxxxxxxx",
+                    "callbackUrl": "",
+                    "serviceCode": "CSG01"
+                },
+                {
+                    "ppId": "999594939303236",
+                    "sufix": "36",
+                    "taxId": "9995949393032",
+                    "initial": "CTR",
+                    "billerId": "999594939303236",
+                    "branchName": "ฝากหลักประกัน",
+                    "merchantId": "924184309216665",
+                    "bankAccount": "xxxxxxxxxx",
+                    "callbackUrl": "",
+                    "serviceCode": "CSG02"
+                }
+            ],
+            "applicationKey": "l7ea56fab2f6754b819a4b8be0ef864d73",
+            "domainCallback": "",
+            "urlCreateQrCode": "https://api-sandbox.partners.scb/partners/sandbox/v1/payment/qrcode/create",
+            "applicationSecret": "d72428e107fb46f6ac54f3ee03e3d3c9"
+        },
+        "createdAt": "2025-11-24T06:38:55.661Z",
+        "updatedAt": "2025-11-24T06:38:55.661Z"
+    },
+    {
+        "id": 1,
+        "bankCode": "000",
+        "serviceCode": "PAYMENT_GATEWAY",
+        "config": {
+            "scb": "PROD",
+            "profileName": "CLASSIC GOLD COMPANY LIMITED",
+            "amountSetting": {
+                "type": "FIXED",
+                "value": 1
+            },
+            "kbankServiceOdd": "OLD",
+            "transferSetting": {
+                "type": "MANUAL"
+            }
+        },
+        "createdAt": "2025-11-24T06:38:03.782Z",
+        "updatedAt": "2025-11-24T06:38:03.782Z"
+    },
+    {
+        "id": 4,
+        "bankCode": "004",
+        "serviceCode": "ODD_PAYMENT",
+        "config": {
+            "logo_url": "",
+            "ddyPayUrl": "https://ws06.kasikornbank.com/ws/v1/ssopay",
+            "passPhrase": "II323K8101LA",
+            "registerUrl": "https://ws06.kasikornbank.com/ws/v1/registerinit",
+            "soapWsdlUrl": "https://ws04.kasikornbank.com/services/EBXPGSSOv1?wsdl",
+            "callback_url": "https://applink.classicgold.biz/web/callback/kbank",
+            "service_name": "letsgold_odd",
+            "corporateName": "CLASSIC GOLD COMPANY LIMITED",
+            "payeeAccountNo": "xxxxx",
+            "external_system": "CLGAPPETN",
+            "payee_short_name": "CLGAPPPYE",
+            "paymentStatusUrl": "https://ws06.kasikornbank.com/services/EBXPGPaymentStatusv1?wsdl",
+            "payerCompanyShortName": "CLGAPPPYR"
+        },
+        "createdAt": "2025-12-08T07:02:12.641Z",
+        "updatedAt": "2025-12-08T07:02:12.641Z"
+    },
+    {
+        "id": 8,
+        "bankCode": "014",
+        "serviceCode": "API_PAYMENT",
+        "config": {
+            "key": "-----BEGIN RSA PRIVATE KEY-----MIIEowIBAAKCAQEAkCZM9KzPC3t6Za7W6s0CEayRGQ7Qw/0WcyvVU426XZKiZo+6z4TG3j9Q8dJPkQOrdQl21MUBUVkoyjP94TvwvNhMTo5boPLn8AsWNdmWkIn1el6hxJKD+WwjBIoKM4bvzzWgTps2FkUsloFqCO71Ox5l8H1jGiU/VIoxkF+85Jj8DVOAEpU1gOIccjCJ6NE/pbIakXBogXFy854CwvRTysTckoOzC0eoAr8ahcPE00GIRL+mEzsWyBG0pNSBGw18ck5uQZHHXrOFTQKWOnqa8lUzW8bQYXt9exufYcUDQMCxGrlMG3lRboTUpQEhGfcb8/jyJN/jhavvhNCSOjTenQIDAQABAoIBACl568CnDHfoUoJ5eTtcO5EsTx+fpLAP3WrMHPiKmiocbAAIsR7OvI3sN/Usp1o5bRci3v8/pC5s8hCkPxOUtKMRtXsQ+QppehUWi5B5CBqUp35LRk6SPckBtV2z/lVvKQc9DeAwRrLHupmfqQvi/crB52D4IxC90OgZT0OUWHyJnb0rJ2iTqaqNKkEq9GFY3qkRxdtftzeBoBM0g4UIw6NPonB2cZKAmwql+2/lXbQ1ejI5fuxl0rVqQXdPr16Nlvha1AYxsha0kxrD+/i8Q2sgwXmo52QYvssHzSDH6C4mezDINfIBDx8U0U88Xs/HJY8G9Dju95oPnOHRM/MlLT0CgYEAxZXiQGfWbuWXQlVE7OqeouEW7HzI/u3aWfM1X9y6wZxio8w1Frx9oISOr3uY9WTJ1VX9n1V2A2q+nHvsduN4pIx0t/yt6swDgjRcsT3XIjvyiB6y/JMLkqTNYBS9FfLIpxO0HYUT+Za1YevP57y+kLLfzEtx+oXYBhgdAHxiGycCgYEAusQpOI6PjkAUFvEfLjW4Nlo/O1CtuxHEM816SebwyB33feNVd0YHw9BWGoJl0P+eQzGcEPOn5lENcDEJSqGffkjLRpSHpokfAssBqEQO10bNlY1jGJvdgNANfP7K9VO+RO30KVucwhJ8bSuPRuksy9iLJ4+5MdHiV/6BSZg64psCgYATk1b4JJGFKTAEPWh3xIL1BjH8Ohy7zRruAH+QQNEr72+CZO/5kbEsnxV341nzLgolHcDj8Vag3gmGfWyfFshUHSpPNDSS56WNV9y7HrJazO+pdskq5vKlk7hZRZS6QPSKQRR+PDoPZ1QPIIrXncaPlXlAx1TCilItwGPXMXuSzwKBgBExV54WOY7dxTurbLRjS5btTd7W+Xc8FnSyWKyO7uFtKMhU8hwtvS9AcXy1Pkw0C8yht300AOPJ2FPYn8NYB4enidbwe2BQRSOLrpZf1YHpyakXv+SXDJf8DxHPnr1gvSY5RX29KjwPWZbvKJxdgLsvLvgwWdsFODHjguFUey87AoGBAJyIhrMpH0Zn22J8AqH7AG2Mpk2tmMyVrIwyo6uabYSf4A5wg6HuK/SstN3rmnIVwfdy5EfHGcpaH9UXshsEj/pTmGM4GbLvHbspIeOTwieMhtNJUyPXwjw3YZrFkSjr/9n41yTxqtSiBWr5o6urAxuV11D52ksS+4sSNt8Wylq8-----END RSA PRIVATE KEY-----",
+            "cert": "-----BEGIN CERTIFICATE-----MIIDlTCCAn2gAwIBAgIQM1GeG9ddRe+0HWgFviXzmDANBgkqhkiG9w0BAQsFADCBrzELMAkGA1UEBhMCVEgxEDAOBgNVBAgTB0Jhbmdrb2sxEjAQBgNVBAcTCUNoYXR1Y2hhazE4MDYGA1UEChMvVGhlIFNpYW0gQ29tbWVyY2lhbCBCYW5rIFB1YmxpYyBDb21wYW55IExpbWl0ZWQxCzAJBgNVBAsTAkVBMRIwEAYDVQQDEwlTQ0IgRUEgQ0ExHzAdBgkqhkiG9w0BCQEWEGVhX2FwaUBzY2IuY28udGgwHhcNMjUxMjI0MTAxOTEwWhcNMjYxMjI1MTAxOTEwWjBdMSUwIwYDVQQKExxDTEFTU0lDIEdPTEQgQ09NUEFOWSBMSU1JVEVEMTQwMgYKCZImiZPyLGQBARMkNjU2NmI5ZGEtYmMwZS00ODMwLTkwYTYtZGRlYmVlN2M4M2JkMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkCZM9KzPC3t6Za7W6s0CEayRGQ7Qw/0WcyvVU426XZKiZo+6z4TG3j9Q8dJPkQOrdQl21MUBUVkoyjP94TvwvNhMTo5boPLn8AsWNdmWkIn1el6hxJKD+WwjBIoKM4bvzzWgTps2FkUsloFqCO71Ox5l8H1jGiU/VIoxkF+85Jj8DVOAEpU1gOIccjCJ6NE/pbIakXBogXFy854CwvRTysTckoOzC0eoAr8ahcPE00GIRL+mEzsWyBG0pNSBGw18ck5uQZHHXrOFTQKWOnqa8lUzW8bQYXt9exufYcUDQMCxGrlMG3lRboTUpQEhGfcb8/jyJN/jhavvhNCSOjTenQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBGhOhkmEOLBA7gRVO9bkBuYLss6azjrPLKdojuqEWMg6m40H/zXaeTuCT4DmkWZ0ApjhWD1AKSziERmvPKtIV0wAF+daHZyHsYgpjb+EOtR3es2OFsNB3CqlC9bOvAvTcpLfudlZ/P7/7kuU6HBzwp06j6VDfGe/Nn0rtIqblXxvIfnTAtodJza8kYAHRq0QTgJHO0o+y/vZizLMmeIuaPnPIWhvwBuZEVzpx93ycsdVZRSOrh+O9+xAHGknhPehW6SuTNoAG/9JQCMfcxC4+8Vy6Ap6yMDwSE9ektHJrEUWWkKJoiefglhvcTENYIoKrmMawWZ1/yGEGnCwwJh1Wf-----END CERTIFICATE-----",
+            "taxId": "0105560117381",
+            "urlToken": "https://api-partners.scb.co.th/partners/v1/oauth/token",
+            "accountNo": "0063061312",
+            "confirmUrl": "https://api-partners.scb.co.th/partners/v2/payment/transfer/confirm",
+            "inquiryUrl": "https://api-partners.scb.co.th/partners/v1/payment/transfer/inquiry",
+            "merchantID": "CSG",
+            "urlpayment": "https://api-partners.scb.co.th/partners/v2/payment/transfer/credit/initiate",
+            "corporateId": "cgol857",
+            "corporateName": "CLASSIC GOLD COMPANY LIMITED",
+            "applicationKey": "l7858297c8000b45e280d4a84c91ce9d25",
+            "applicationSecret": "229e69f81cb04820ac2f6b11c6b6151d"
+        },
+        "createdAt": "2025-12-10T12:24:17.881Z",
+        "updatedAt": "2025-12-10T12:24:17.881Z"
+    },
+    {
+        "id": 3,
+        "bankCode": "014",
+        "serviceCode": "ODD_PAYMENT_UAT",
+        "config": {
+            "urlToken": "https://api-uat.partners.scb/partners/v1/oauth/token",
+            "urlddpay": "https://api-uat.partners.scb/partners/v1/payment/direct/ddpay",
+            "accountNo": "1113000115",
+            "publicKey": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAnWUXl7kx/L++b2wv7HQwEcrH9aB+FEmHIzE3tw+vHklgc7M3JBMllda6RQ3PH/r5hNn5QejL6k8N3z62OSFHhOr0VtpTDahJboY9/S4Gyd1W4US6mBw/HGiJb4HcCflYohqLBDww/FYBxUDi1uzPUHbjT5mEBlBXaTE6RKlkNBcM1WQeWcRQanxtBGrYyl3yPhbkXutqWPZ/34EIP3dkNQaz7ru412ba2oht1D/o4nb+qi42aDXOxDiGy+Vo2cwEjDgH9CWkn/K3ti07Ywrtac89RQAKhfMhfXxaIsX4BOYkha5aIxy+16p9wEgFOtdHSXuVqT1C7NmSNDbabq+OEjSK09dpCbPP6piDPeC5CEkmcI2/Tj1afM83GpgGqk2ifbRBlpr9NtEtIiw1swP29lptkk7PyiCReBRBmJPO5H6gSKhijt23xUMmbGOkLyp/cR7m8uV1iuiIMrJIfABOw/OBqd99LdHHGWvRICkFaA7lm74sOpJdo62NQ35urKLrODE+vO2C8+cbJTnBtmdvXNqaxCMwc9wipQKNgZrA80HITPvLCYzi3omCXnOxTFf0aQ987lX9oxap8ojjo+GzPsA0TK1Md83lhQCiCT3RavE2qdGdMrLZBGhW1JvuDZk2PhLXzCP0uLiifox+kqwJmJzv+hRZ+rB9mLAkn1FXjssCAwEAAQ==",
+            "merchantId": "2025000718",
+            "urlRegister": "https://api-uat.partners.scb/partners/v1/registration/web/init",
+            "merchantName": "CLASSIC GOLD CO., LTD.",
+            "subAccountId": "202512017719",
+            "applicationKey": "l725aaf77cebb64a1a89eb8271902f3912",
+            "domainCallback": "https://applink.classicgold.biz/callback/scb",
+            "applicationSecret": "42e941ac4d8c466aab80a2842d74a838"
+        },
+        "createdAt": "2025-11-24T09:45:58.298Z",
+        "updatedAt": "2025-11-24T09:45:58.298Z"
+    },
+    {
+        "id": 6,
+        "bankCode": "014",
+        "serviceCode": "ODD_PAYMENT_SANDBOX",
+        "config": {
+            "urlToken": "https://api-sandbox.partners.scb/partners/sandbox/v1/oauth/token",
+            "urlddpay": " https://api-sandbox.partners.scb/partners/sandbox/v1/payment/direct/ddpay",
+            "publicKey": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAg3Pl2zcVCOWBv7JZ3VQyQ082SjL5GauzWTyzPQxejtLBNkMfd/cH97TBV6Je5YMn46bY67ayFi2xfCoh8Lg0QWP8vVovfw8QIoyR4QaE0+zUiz4/i6M3k628pVBFrge/Iuz0CgmAN5g3AGS3CRq1+XdJvIwpbnfIrQY0UFubzUvKkQyNNiI2LINSXLKMjxp/jPRDbA81/CXmG47VVMwU8hr89xqSCKMLSw1KMbfn4SGy/6qosyIFebPyP3wdNrfRGHuiT1f7/3sfICtVT2/k5Rh2cpvI//nn9LuOVnVbIdIn5zLVvASKCzbxE2JyF4Bd6qbEotkSEmdrNzSaNd7MV7JV7D2r7EbVaajHZIiS8FwCCCCaDJeRM44uXZR30Kie2HzR3iTeQIe6g7Mdb8JsKHvgL9TXdSwfkbcuCOwCluwrVj1CpQkvBQ1xe31+/+cxBKXUUVnNZ9A1i57elgANEfxB7F6kGLFL+eFdIOU5Os0X+9wNTMkFgXAqHWoL7oaHR3ngFG0UsUv0Dhzx3q7/yPoFpVqf9XnjHwZf41NfwYFfoGMJ50HdmWpxDRPDKb3vfWgTVqLdo7hN4njg0Fm3yWg2EbiKDp29oenN6+FV6QmXeiy7Od2nLf1t00fwIbIvzwv2BW1k4MFzm7A6w954WoJnLI0Xf8uMdP/FebSZaFECAwEAAQ==",
+            "merchantId": "9325399998",
+            "urlRegister": "https://api-sandbox.partners.scb/partners/sandbox/v1/registration/web/init",
+            "merchantName": "CLASSIC GOLD COMPANY LIMITED",
+            "subAccountId": "342291117737",
+            "applicationKey": "l7ea56fab2f6754b819a4b8be0ef864d73",
+            "domainCallback": "https://applink.classicgold.biz/web/callback/scb",
+            "applicationSecret": "d72428e107fb46f6ac54f3ee03e3d3c9"
+        },
+        "createdAt": "2025-12-10T05:07:08.044Z",
+        "updatedAt": "2025-12-10T05:07:08.044Z"
+    },
+    {
+        "id": 9,
+        "bankCode": "014",
+        "serviceCode": "ODD_PAYMENT",
+        "config": {
+            "urlToken": "https://api.partners.scb/partners/v1/oauth/token",
+            "urlddpay": "https://api.partners.scb/partners/v1/payment/direct/ddpay",
+            "accountNo": "0063061312",
+            "publicKey": "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqP70t4NF/R5Xwd7e1hL/OpA8HNvSgyUvAvot6bfAPBay/QtHV7T6AzLZQUCvp6qAazTgCPSuNmLjfb9pyp03sZP3/CUApGJA1FVtrlhcC63bqiTelFciJVvqQXdqEps9AVJijx28hE/aaZCLLBnDG1G2H47amGfeaGKvE0b2qH0MnbZzApwetgLezWQ3s1ouP882O1PgHbtV/+xG8dnmeZSNR3SJnElHbxWtNM5w/WcDBoU0wnffNTADaKzIHzF7sk98cfJE+IIf9nbJNGicl9cF9rYpvvxCz52C3TZzboYrHIbwjdiO8Ilr6YqEqdKXd9dreAiEzbp6W/H4d40Wj3iW+hfNbsJua27Mfh+sSeOrHZhBwu7JKtI20V9tMYdABLGFenwZu5ek7/i46Mk55j7Ky6qyLpqAj2iVgyiIvwfYkHZQJV4EuJ9/gXzy32YUCF/Dqh32fa7yb2+FZveOtDpbMXFfn21SgewQ+apBjrNVl9ZYQb5xsDOfLY3WHXHxpb6L94UabcT4IMzdMQRjXuds9hHWSGhD9+Xs3Ia0uR+Bh8qqg69XHmMXG9qWLpe8VjYyRWqmFvqWYNMGhLtx6pg3F+Oe3Ab/UB2Twn9bXFqJhzluPfSs38yhOHobt+YN/ZLl/638tC1ONrrCEMLBFWOAIeV4uEea/jMdK50mhLECAwEAAQ==",
+            "merchantId": "2025813505",
+            "urlRegister": "https://api.partners.scb/partners/v1/registration/web/init",
+            "merchantName": "CLASSIC GOLD CO., LTD.",
+            "subAccountId": "202502189850",
+            "applicationKey": "l7898c01bc42994a2da0ecce80e401541d",
+            "domainCallback": "https://applink.classicgold.biz/web/callback/scb",
+            "applicationSecret": "5a15917c32ac421491b9361d7b7bf0e5"
+        },
+        "createdAt": "2025-11-24T09:45:58.298Z",
+        "updatedAt": "2025-11-24T09:45:58.298Z"
+    }
+]
