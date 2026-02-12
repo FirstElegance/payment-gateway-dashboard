@@ -3,24 +3,25 @@ import axios from "axios";
 // ใช้ proxy ใน development, production ใช้ URL จาก .env
 const API_BASE_URL = import.meta.env.DEV
   ? "/api" // ใช้ /api เพื่อให้ proxy ทำงาน
-  : (import.meta.env.VITE_PAYMENT_URL ||
-      "https://lhcgoldplus.com/v2/paymentgateway");
+  : import.meta.env.VITE_PAYMENT_URL || "";
 
 // Default token จาก .env (fallback ถ้าไม่มี localStorage)
-const DEFAULT_AUTH_TOKEN =
-  import.meta.env.VITE_PAYMENT_TOKEN ||
-  "Basic bGhjX1BheW1lbnRHYXRld2F5OmZYc2NxOG84TUxMcXg0Tm1mSFB1bFRqTTFYTUZSbnF1ZDV1a1J5dHNXWVJucWlTalQ3";
+const DEFAULT_AUTH_TOKEN = import.meta.env.VITE_PAYMENT_TOKEN || "";
+
+// Helper function to normalize token (ensure it has "Basic " prefix)
+const normalizeToken = (token) => {
+  if (!token) return null;
+  return token.startsWith("Basic ") ? token : `Basic ${token}`;
+};
 
 // Get auth token from localStorage or use default
 const getAuthToken = () => {
   const storedToken = localStorage.getItem("elegance_token");
   // If token already includes "Basic " prefix, use it directly, otherwise add it
   if (storedToken) {
-    return storedToken.startsWith("Basic ")
-      ? storedToken
-      : `Basic ${storedToken}`;
+    return normalizeToken(storedToken);
   }
-  return DEFAULT_AUTH_TOKEN;
+  return normalizeToken(DEFAULT_AUTH_TOKEN);
 };
 
 const apiClient = axios.create({
@@ -39,7 +40,7 @@ apiClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 apiClient.interceptors.response.use(
@@ -55,7 +56,7 @@ apiClient.interceptors.response.use(
       status: error.response?.status,
       data: error.response?.data,
     });
-  }
+  },
 );
 
 export const bankConfigAPI = {
@@ -66,7 +67,7 @@ export const bankConfigAPI = {
 
   getOne: async (bankCode, serviceCode) => {
     const response = await apiClient.get(
-      `/bank-configs/${bankCode}/${serviceCode}`
+      `/bank-configs/${bankCode}/${serviceCode}`,
     );
     return response.data;
   },
@@ -84,7 +85,7 @@ export const bankConfigAPI = {
   update: async (bankCode, serviceCode, data) => {
     const response = await apiClient.put(
       `/bank-configs/${bankCode}/${serviceCode}`,
-      data
+      data,
     );
     return response.data;
   },
@@ -108,17 +109,21 @@ export const paymentRegistrationsAPI = {
    */
   getAll: async (page = 1, limit = 10, filters = {}) => {
     const params = { page, limit };
-    
+
     // Add filters to params
-    if (filters.bankCode && filters.bankCode !== 'all') params.bankCode = filters.bankCode;
-    if (filters.status && filters.status !== 'all') params.status = filters.status;
+    if (filters.bankCode && filters.bankCode !== "all")
+      params.bankCode = filters.bankCode;
+    if (filters.status && filters.status !== "all")
+      params.status = filters.status;
     if (filters.search) params.search = filters.search;
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
     if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.amountMin) params.amountMin = filters.amountMin;
     if (filters.amountMax) params.amountMax = filters.amountMax;
-    
-    const response = await apiClient.get("/bank-registrations/payments", { params });
+
+    const response = await apiClient.get("/bank-registrations/payments", {
+      params,
+    });
     return response.data;
   },
 
@@ -156,17 +161,21 @@ export const fundTransfersAPI = {
    */
   getAll: async (page = 1, limit = 10, filters = {}) => {
     const params = { page, limit };
-    
+
     // Add filters to params
-    if (filters.bankCode && filters.bankCode !== 'all') params.bankCode = filters.bankCode;
-    if (filters.status && filters.status !== 'all') params.status = filters.status;
+    if (filters.bankCode && filters.bankCode !== "all")
+      params.bankCode = filters.bankCode;
+    if (filters.status && filters.status !== "all")
+      params.status = filters.status;
     if (filters.search) params.search = filters.search;
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
     if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.amountMin) params.amountMin = filters.amountMin;
     if (filters.amountMax) params.amountMax = filters.amountMax;
-    
-    const response = await apiClient.get("/bank-registrations/fund-transfers", { params });
+
+    const response = await apiClient.get("/bank-registrations/fund-transfers", {
+      params,
+    });
     return response.data;
   },
 
@@ -177,7 +186,7 @@ export const fundTransfersAPI = {
    */
   getById: async (id) => {
     const response = await apiClient.get(
-      `/bank-registrations/fund-transfers/${id}`
+      `/bank-registrations/fund-transfers/${id}`,
     );
     return response.data;
   },
@@ -187,7 +196,9 @@ export const fundTransfersAPI = {
    * @returns {Promise<Object>} Statistics by bank
    */
   getStats: async () => {
-    const response = await apiClient.get("/bank-registrations/fund-transfers/stats");
+    const response = await apiClient.get(
+      "/bank-registrations/fund-transfers/stats",
+    );
     return response.data;
   },
 };
@@ -206,14 +217,16 @@ export const bankRegistrationsAPI = {
    */
   getAll: async (page = 1, limit = 10, filters = {}) => {
     const params = { page, limit };
-    
+
     // Add filters to params
-    if (filters.bankCode && filters.bankCode !== 'all') params.bankCode = filters.bankCode;
-    if (filters.status && filters.status !== 'all') params.status = filters.status;
+    if (filters.bankCode && filters.bankCode !== "all")
+      params.bankCode = filters.bankCode;
+    if (filters.status && filters.status !== "all")
+      params.status = filters.status;
     if (filters.search) params.search = filters.search;
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
     if (filters.dateTo) params.dateTo = filters.dateTo;
-    
+
     const response = await apiClient.get("/bank-registrations", { params });
     return response.data;
   },
@@ -259,7 +272,7 @@ export const transferConfigAPI = {
    */
   getBankInfoExport: async () => {
     const response = await apiClient.get(
-      "/transfer-config/bank-info?type=export"
+      "/transfer-config/bank-info?type=export",
     );
     return response.data?.data || [];
   },
@@ -270,7 +283,7 @@ export const transferConfigAPI = {
    */
   getBankInfoImport: async () => {
     const response = await apiClient.get(
-      "/transfer-config/bank-info?type=import"
+      "/transfer-config/bank-info?type=import",
     );
     return response.data?.data || [];
   },
@@ -296,7 +309,7 @@ export const transferConfigAPI = {
    */
   toggleBankActive: async (id) => {
     const response = await apiClient.put(
-      `/transfer-config/show-bank/${id}/toggle`
+      `/transfer-config/show-bank/${id}/toggle`,
     );
     return response.data;
   },
