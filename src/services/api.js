@@ -21,14 +21,9 @@ const normalizeToken = (token) => {
   return token.startsWith("Basic ") ? token : `Basic ${token}`;
 };
 
+// ใช้ Basic token เดียวจาก .env
 const getAuthToken = () => {
-  const storedToken = localStorage.getItem("elegance_token");
-
-  if (storedToken) {
-    return normalizeToken(storedToken);
-  }
-
-  return normalizeToken(DEFAULT_AUTH_TOKEN);
+  return `Basic ${import.meta.env.VITE_PAYMENT_TOKEN}`;
 };
 
 /**
