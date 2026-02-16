@@ -1414,13 +1414,13 @@ const Dashboard = () => {
 
   // Calculate Net Total Payments (Sell - Buy) regardless of active tab
   // Buy = Payments.totalAmount, Sell = FundTransfers.totalAmount
-  const calculateNetTotalPayments = () => {
+const calculateNetTotalPayments = () => {
     const pSummary = (paymentStats?.data || paymentStats)?.summary || {};
     const ftSummary = (fundTransferStats?.data || fundTransferStats)?.summary || {};
     const buy = pSummary.totalAmount || 0;
     const sell = ftSummary.totalAmount || 0;
     return {
-      net: sell - buy,
+      net: buy - sell,
       buy: buy,
       sell: sell,
     };

@@ -6,6 +6,13 @@ export default defineConfig(({ mode }) => {
   const apiBaseUrl = env.VITE_PAYMENT_URL || "";
   const apiAuthToken = env.VITE_PAYMENT_TOKEN || "";
 
+  // Normalize token (ensure it has "Basic " prefix if needed)
+  const normalizeToken = (token) => {
+    if (!token) return null;
+    return token.startsWith("Basic ") ? token : `Basic ${token}`;
+  };
+  const normalizedToken = normalizeToken(apiAuthToken);
+
   return {
     plugins: [react()],
     server: {
@@ -15,10 +22,10 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ""),
-          ...(apiAuthToken && {
+          ...(normalizedToken && {
             configure: (proxy) => {
               proxy.on("proxyReq", (proxyReq) => {
-                proxyReq.setHeader("Authorization", apiAuthToken);
+                proxyReq.setHeader("Authorization", normalizedToken);
               });
             },
           }),

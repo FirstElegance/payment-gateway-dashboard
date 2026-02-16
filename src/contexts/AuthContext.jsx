@@ -59,16 +59,23 @@ export const AuthProvider = ({ children }) => {
         };
       }
       
+      // Normalize token (ensure it has "Basic " prefix if needed)
+      const normalizeToken = (token) => {
+        if (!token) return null;
+        return token.startsWith("Basic ") ? token : `Basic ${token}`;
+      };
+      const normalizedToken = normalizeToken(token);
+      
       // Create user data from response
         const userData = {
         username: response.data?.username || username,
         name: response.data?.username || username,
-        token: token,
+        token: normalizedToken,
         };
 
         setUser(userData);
         localStorage.setItem('elegance_user', JSON.stringify(userData));
-      localStorage.setItem('elegance_token', token);
+      localStorage.setItem('elegance_token', normalizedToken);
         
         return { success: true };
     } catch (error) {
