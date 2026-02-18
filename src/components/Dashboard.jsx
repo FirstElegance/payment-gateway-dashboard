@@ -186,6 +186,7 @@ const Dashboard = () => {
   });
 
   const [newMembersTodayCount, setNewMembersTodayCount] = useState(0);
+  const [totalMembersCount, setTotalMembersCount] = useState(0);
 
   // Chart date range derived from dropdown (for fallback filter)
   const chartDateRangeForFallback = useMemo(() => {
@@ -277,12 +278,17 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load new members count for today
+  // Load new members count for today and total members count
   useEffect(() => {
     const loadNewMembersToday = async () => {
       try {
         const response = await membersAPI.getAll();
         const members = Array.isArray(response) ? response : [];
+        
+        // จำนวนสมาชิกทั้งหมด
+        setTotalMembersCount(members.length);
+        
+        // จำนวนสมาชิกใหม่วันนี้
         const today = new Date();
         const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
         const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
@@ -294,6 +300,7 @@ const Dashboard = () => {
       } catch (err) {
         console.error('Error loading new members today:', err);
         setNewMembersTodayCount(0);
+        setTotalMembersCount(0);
       }
     };
     loadNewMembersToday();
@@ -1839,7 +1846,7 @@ const calculateNetTotalPayments = () => {
         )}
         
         {/* New Members Today */}
-        <div className="bg-emerald-50 dark:bg-slate-800/50 backdrop-blur-sm border border-emerald-100 dark:border-slate-800 p-4 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-colors shadow-sm" title="Number of new members registered today">
+        <div className="bg-emerald-50 dark:bg-slate-800/50 backdrop-blur-sm border border-emerald-100 dark:border-slate-800 p-4 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-colors shadow-sm" title="New members registered today and total members">
           <div className="flex justify-between items-start mb-2">
             <div>
               <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider transition-colors">
@@ -1851,17 +1858,18 @@ const calculateNetTotalPayments = () => {
             </div>
             <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="text-[10px] text-gray-600 dark:text-slate-400 mt-3 border-t border-emerald-100 dark:border-slate-700/50 pt-2 transition-colors">
-            New members registered today
+          <div className="flex justify-between items-center text-[10px] text-gray-600 dark:text-slate-400 mt-3 border-t border-emerald-100 dark:border-slate-700/50 pt-2 transition-colors">
+            <span>New members today</span>
+            <span className="font-bold text-emerald-700 dark:text-emerald-300">Total: {totalMembersCount.toLocaleString()}</span>
           </div>
         </div>
       </div>
 
       {/* Charts */}
-      <div className={`grid grid-cols-1 ${activeTab === 'bank-registrations' ? 'lg:grid-cols-1' : 'lg:grid-cols-3'} gap-6 min-h-80`}>
+      <div className="grid grid-cols-1 gap-6 min-h-80">
         {/* Transaction Flow Chart - Hidden for Bank Registrations */}
         {activeTab !== 'bank-registrations' && (
-          <div className="lg:col-span-2 bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-5 rounded-lg shadow-sm">
+          <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-5 rounded-lg shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3 min-w-0">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm transition-colors">
@@ -2032,73 +2040,6 @@ const calculateNetTotalPayments = () => {
           </div>
         )}
 
-        {/* Bank Distribution / Registrations by Bank */}
-        <div className={`bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-5 rounded-lg shadow-sm ${activeTab === 'bank-registrations' ? 'lg:col-span-1' : ''}`}>
-          <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-4 transition-colors">
-            {activeTab === 'bank-registrations' ? 'Registrations by Bank' : 'Bank Distribution'}
-          </h3>
-          <div className="h-96 flex items-center justify-center relative">
-            {tableLoading ? (
-              <AppLoading size="md" text="Loading Bank Distribution..." />
-            ) : (
-              <>
-            <Doughnut 
-              key={`bank-dist-${activeTab}-${sortedBankNames.length}-${sortedBankNames.join('-')}`}
-              data={bankDistributionData} 
-              options={donutOptions} 
-            />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="text-center">
-                <div className="text-sm text-gray-500 dark:text-slate-400 transition-colors">Total</div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-                  {useCount 
-                    ? Object.values(bankStatsForChart || {}).reduce((sum, stats) => sum + (stats?.count || 0), 0)
-                    : formatThaiBaht(Object.values(bankStatsForChart || {}).reduce((sum, stats) => sum + (stats?.amount || 0), 0))
-                  }
-                </div>
-              </div>
-            </div>
-              </>
-            )}
-          </div>
-          <div className="mt-4 grid grid-cols-1 gap-2 text-xs">
-            {sortedBankNames.length > 0 ? (
-              sortedBankNames.map((bank) => {
-              const stats = bankStatsForChart[bank];
-                if (!stats) {
-                  console.warn(`⚠️ No stats found for bank: ${bank}`);
-                  return null;
-                }
-              const bankColor = bankColorMap[bank] || '#9ca3af';
-                const iconPath = getBankIconPath(bank);
-                const value = useCount ? (stats?.count || 0) : (stats?.amount || 0);
-                console.log(`🎨 Rendering bank: ${bank}, ${useCount ? 'count' : 'amount'}: ${value}, color: ${bankColor}, iconPath: ${iconPath}`);
-              return (
-                  <div key={bank} className="flex items-center justify-between py-2">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      {iconPath ? (
-                        <img 
-                          src={iconPath} 
-                          alt={bank} 
-                          className="w-7 h-7 rounded object-contain flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: bankColor }}></div>
-                      )}
-                      <span className="text-gray-700 dark:text-slate-300 font-mono transition-colors leading-6">
-                        {useCount ? stats.count : formatThaiBaht(stats.amount || 0)}
-                      </span>
-                  </div>
-                </div>
-              );
-              })
-            ) : (
-              <div className="text-xs text-gray-500 dark:text-slate-400 text-center py-2">
-                No bank data available
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Treasury Monitor */}

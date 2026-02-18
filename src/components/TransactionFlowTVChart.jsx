@@ -55,8 +55,6 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
         transfersFailed: [],
         success: [],
         failed: [],
-        candlestickData: [],
-        barData: [],
         hasType: false,
       };
     }
@@ -103,39 +101,6 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
     const times = Array.from(buckets.keys()).sort((a, b) => a - b);
     const mk = (getter) => times.map((time) => ({ time, value: getter(buckets.get(time)) })).filter((p) => p.value > 0);
 
-    // Candlestick data: OHLC derived from Buy/Sell flow
-    // Level = cumulative (Buy - Sell); Open/Close = level; High/Low = wicks
-    const allVol = times.reduce((sum, t) => {
-      const b = buckets.get(t);
-      if (!b) return sum;
-      const buy = hasType ? b.payments.success + b.payments.failed : b.success;
-      const sell = hasType ? b.transfers.success + b.transfers.failed : b.failed;
-      return sum + buy + sell;
-    }, 0);
-    const scale = Math.max(1, allVol / (times.length || 1) / 50);
-
-    let level = 100;
-    const candlestickData = times
-      .map((time) => {
-        const b = buckets.get(time);
-        if (!b) return null;
-        const buyTotal = hasType ? b.payments.success + b.payments.failed : b.success;
-        const sellTotal = hasType ? b.transfers.success + b.transfers.failed : b.failed;
-        const total = buyTotal + sellTotal;
-        if (total <= 0) return null;
-
-        const open = level;
-        const net = (buyTotal - sellTotal) / scale;
-        level += net;
-        const close = level;
-        const wick = Math.max(0.5, total / scale * 0.15);
-        const high = Math.max(open, close) + wick;
-        const low = Math.min(open, close) - wick;
-
-        return { time, open, high, low, close };
-      })
-      .filter(Boolean);
-
     return {
       paymentsSuccess: mk((b) => b.payments.success),
       paymentsFailed: mk((b) => b.payments.failed),
@@ -143,8 +108,6 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
       transfersFailed: mk((b) => b.transfers.failed),
       success: mk((b) => b.success),
       failed: mk((b) => b.failed),
-      candlestickData,
-      barData: candlestickData, // alias for setData
       hasType,
     };
   }, [rows, getStatus, isSuccess, isPending]);
@@ -285,24 +248,63 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
 
     const baseAutoscale = (original) => {
       const res = original?.();
-      const minV = res?.priceRange?.minValue ?? 0;
-      const maxV = res?.priceRange?.maxValue ?? 100;
-      const pad = Math.max(1, (maxV - minV) * 0.05);
+      const maxValue = res?.priceRange?.maxValue ?? 1;
       return {
-        priceRange: { minValue: minV - pad, maxValue: maxV + pad },
+        priceRange: { minValue: 0, maxValue: Math.max(1, maxValue) },
         margins: { above: 10, below: 0 },
       };
     };
 
-    // Candlestick: แท่งแบบมี body + wick, เขียว = Close > Open (Buy มากกว่า), แดง = Sell มากกว่า
-    const mainSeries = chart.addCandlestickSeries({
-      upColor: '#16a34a',
-      downColor: '#dc2626',
-      borderUpColor: '#16a34a',
-      borderDownColor: '#dc2626',
-      wickUpColor: '#16a34a',
-      wickDownColor: '#dc2626',
-      title: 'Transaction Flow',
+    // กราฟแบบ Area/Line: Buy (Success/Failed) และ Sell (Success/Failed)
+    const paymentsSuccess = chart.addAreaSeries({
+      lineColor: '#16a34a',
+      topColor: 'rgba(22,163,74,0.28)',
+      bottomColor: 'rgba(34,197,94,0.02)',
+      lineWidth: 3,
+      lineStyle: LineStyle.Solid,
+      title: 'Buy (Success)',
+      autoscaleInfoProvider: baseAutoscale,
+    });
+    const paymentsFailed = chart.addLineSeries({
+      color: '#ef4444',
+      lineWidth: 3,
+      lineStyle: LineStyle.Dashed,
+      title: 'Buy (Failed)',
+      autoscaleInfoProvider: baseAutoscale,
+    });
+
+    const transfersSuccess = chart.addAreaSeries({
+      lineColor: '#dc2626',
+      topColor: 'rgba(220,38,38,0.22)',
+      bottomColor: 'rgba(239,68,68,0.02)',
+      lineWidth: 3,
+      lineStyle: LineStyle.Solid,
+      title: 'Sell (Success)',
+      autoscaleInfoProvider: baseAutoscale,
+    });
+    const transfersFailed = chart.addLineSeries({
+      color: '#f97316',
+      lineWidth: 3,
+      lineStyle: LineStyle.Dashed,
+      title: 'Sell (Failed)',
+      autoscaleInfoProvider: baseAutoscale,
+    });
+
+    // Fallback (no type): keep legacy 2 series
+    const legacySuccess = chart.addAreaSeries({
+      lineColor: '#22c55e',
+      topColor: 'rgba(34,197,94,0.25)',
+      bottomColor: 'rgba(34,197,94,0.02)',
+      lineWidth: 2,
+      title: 'Success',
+      autoscaleInfoProvider: baseAutoscale,
+    });
+    const legacyFailed = chart.addAreaSeries({
+      lineColor: '#ef4444',
+      topColor: 'rgba(239,68,68,0.20)',
+      bottomColor: 'rgba(239,68,68,0.02)',
+      lineWidth: 2,
+      title: 'Failed',
       autoscaleInfoProvider: baseAutoscale,
     });
 
@@ -317,8 +319,13 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
 
     chartRef.current = chart;
     seriesRef.current = {
-      mainSeries,
+      paymentsSuccess,
+      paymentsFailed,
+      transfersSuccess,
+      transfersFailed,
       loadingSeries,
+      legacySuccess,
+      legacyFailed,
     };
 
     // Custom tooltip (TradingView-like)
@@ -548,31 +555,42 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
     const s = seriesRef.current;
     if (!s) return;
 
-    const candlestickData = data?.candlestickData || data?.barData || [];
-    s.mainSeries?.setData?.(candlestickData);
-    
-    const chart = chartRef.current;
-    if (!chart || !candlestickData.length) return;
+    const hasType = !!data?.hasType;
+    // hide/show by setting empty data to the unused series
+    if (hasType) {
+      s.paymentsSuccess?.setData?.(data.paymentsSuccess || []);
+      s.paymentsFailed?.setData?.(data.paymentsFailed || []);
+      s.transfersSuccess?.setData?.(data.transfersSuccess || []);
+      s.transfersFailed?.setData?.(data.transfersFailed || []);
+      // keep loading series separate
+      s.legacySuccess?.setData?.([]);
+      s.legacyFailed?.setData?.([]);
+    } else {
+      s.legacySuccess?.setData?.(data.success || []);
+      s.legacyFailed?.setData?.(data.failed || []);
+      s.paymentsSuccess?.setData?.([]);
+      s.paymentsFailed?.setData?.([]);
+      s.transfersSuccess?.setData?.([]);
+      s.transfersFailed?.setData?.([]);
+    }
+    chartRef.current?.timeScale()?.fitContent?.();
 
-    const timeScale = chart.timeScale();
-    
-    // แสดงข้อมูล 100% ทั้งหมดด้วย fitContent()
-    // หมายเหตุ: เมื่อแสดงข้อมูลทั้งหมด จะ pan ไม่ได้โดยไม่ต้องซูมก่อน (ข้อจำกัดของ lightweight-charts)
-    // ต้อง Zoom In ก่อนแล้วถึงจะ pan ได้
-    timeScale.fitContent();
-
-    const lastCandle = candlestickData.length ? candlestickData[candlestickData.length - 1] : null;
-    const last = lastCandle ? (lastCandle.close ?? lastCandle.high ?? 100) : 100;
+    // Update loading baseline from real data (so the loading wave feels "attached" to the market level)
+    const last =
+      (data?.paymentsSuccess?.[data.paymentsSuccess.length - 1]?.value) ??
+      (data?.transfersSuccess?.[data.transfersSuccess.length - 1]?.value) ??
+      (data?.success?.[data.success.length - 1]?.value) ??
+      1;
     const baseline = Math.max(1, Number(last) || 1);
     loadingBaselineRef.current = {
       baseline,
-      amp: Math.max(1, baseline * 0.03),
+      amp: Math.max(1, baseline * 0.03), // 3% wave
     };
   }, [data]);
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Legend: Candlestick - เขียว = Buy มากกว่า, แดง = Sell มากกว่า */}
+      {/* Legend: Area/Line chart */}
       <div
         style={{
           position: 'absolute',
@@ -589,10 +607,16 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
         }}
       >
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 10, height: 14, backgroundColor: '#16a34a', border: '1px solid #16a34a', borderRadius: 1 }} /> Buy
+          <span style={{ width: 18, height: 0, borderTop: '3px solid #16a34a' }} /> Buy (Success)
         </span>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 10, height: 14, backgroundColor: '#dc2626', border: '1px solid #dc2626', borderRadius: 1 }} /> Sell
+          <span style={{ width: 18, height: 0, borderTop: '3px dashed #ef4444' }} /> Buy (Failed) 
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 18, height: 0, borderTop: '3px solid #dc2626' }} /> Sell (Success)
+        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 18, height: 0, borderTop: '3px dashed #f97316' }} /> Sell (Failed)
         </span>
       </div>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />

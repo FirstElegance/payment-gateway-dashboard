@@ -241,7 +241,6 @@ const PaymentsList = () => {
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       setPagination(prev => ({ ...prev, page: newPage }));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

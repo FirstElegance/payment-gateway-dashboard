@@ -42,6 +42,9 @@ const BankConfigList = () => {
   const [showBankList, setShowBankList] = useState(true);
   const [loadingBankList, setLoadingBankList] = useState(false);
   const [togglingBank, setTogglingBank] = useState(null); // ID of bank being toggled
+  
+  // Toggle bank active/inactive confirmation modal
+  const [toggleBankModal, setToggleBankModal] = useState({ isOpen: false, bank: null });
 
   // Fetch data
   useEffect(() => {
@@ -120,12 +123,19 @@ const BankConfigList = () => {
     }
   };
 
-  const handleToggleBankActive = async (bankId) => {
+  const handleToggleBankClick = (bank) => {
+    setToggleBankModal({ isOpen: true, bank });
+  };
+
+  const handleToggleBankConfirm = async () => {
+    if (!toggleBankModal.bank) return;
+
     try {
-      setTogglingBank(bankId);
-      await transferConfigAPI.toggleBankActive(bankId);
+      setTogglingBank(toggleBankModal.bank.id);
+      await transferConfigAPI.toggleBankActive(toggleBankModal.bank.id);
       // Reload bank list after toggle
       await loadBankList();
+      setToggleBankModal({ isOpen: false, bank: null });
     } catch (err) {
       alert(`Failed to toggle bank status: ${err.message}`);
       console.error('Error toggling bank status:', err);
@@ -240,7 +250,7 @@ const BankConfigList = () => {
 
       {/* Payment Gateway Section (Business Layer) */}
       {paymentGatewayConfig && (
-        <div className="bg-white dark:bg-slate-900/70 border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
+        <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
           <div 
             className="px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/70"
             onClick={() => setShowBusinessLayer(!showBusinessLayer)}
@@ -264,13 +274,15 @@ const BankConfigList = () => {
             <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => navigate(`/bank-configs/view/${paymentGatewayConfig.bankCode}/${paymentGatewayConfig.serviceCode}`)}
-                className="flex items-center gap-1 px-3 py-1.5 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 rounded-lg text-xs transition-colors"
+                title="View business layer configuration details"
+                className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-slate-200 rounded-lg text-xs transition-colors"
               >
                 <Eye className="w-3 h-3" />
                 View
               </button>
               <button
                 onClick={() => navigate(`/bank-configs/edit/${paymentGatewayConfig.bankCode}/${paymentGatewayConfig.serviceCode}`)}
+                title="Edit business layer configuration"
                 className="flex items-center gap-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg text-xs transition-colors"
               >
                 <Edit className="w-3 h-3" />
@@ -279,15 +291,15 @@ const BankConfigList = () => {
             </div>
           </div>
           {showBusinessLayer && (
-          <div className="p-5 bg-gray-50 dark:bg-slate-900/50 transition-colors">
+          <div className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors">
+              <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors" title="SCB API Profile Name">
                 <div className="text-xs text-gray-500 dark:text-slate-400 mb-1 transition-colors">Profile Name</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm transition-colors">
                   {paymentGatewayConfig.config?.profileName || '-'}
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors">
+              <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors" title="SCB API Environment (PROD or UAT)">
                 <div className="text-xs text-gray-500 dark:text-slate-400 mb-1 transition-colors">Environment</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm transition-colors">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs transition-colors ${
@@ -299,7 +311,7 @@ const BankConfigList = () => {
                   </span>
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors">
+              <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors" title="Payment amount setting (FIXED or RANDOM)">
                 <div className="text-xs text-gray-500 dark:text-slate-400 mb-1 transition-colors">Amount Setting</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm transition-colors">
                   {paymentGatewayConfig.config?.amountSetting?.type || '-'}
@@ -308,7 +320,7 @@ const BankConfigList = () => {
                   }
                 </div>
               </div>
-              <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors">
+              <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 shadow-sm transition-colors" title="Bank transfer mapping for sell transactions">
                 <div className="text-xs text-gray-500 dark:text-slate-400 mb-1 transition-colors">Sell</div>
                 <div className="font-semibold text-gray-900 dark:text-white text-sm transition-colors">
                   {paymentGatewayConfig.config?.transferMapping ? (() => {
@@ -363,7 +375,7 @@ const BankConfigList = () => {
       )}
 
       {/* Bank List Section */}
-      <div className="bg-white dark:bg-slate-900/70 border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
+      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
         <div 
           className="px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center transition-colors cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800/70"
           onClick={() => setShowBankList(!showBankList)}
@@ -437,8 +449,9 @@ const BankConfigList = () => {
                           </div>
                         </div>
                       <button
-                        onClick={() => handleToggleBankActive(bank.id)}
+                        onClick={() => handleToggleBankClick(bank)}
                         disabled={togglingBank === bank.id}
+                        title={bank.isActive ? `Disable ${bank.bankNameEng}` : `Enable ${bank.bankNameEng}`}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                           bank.isActive
                             ? 'bg-red-50 dark:bg-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/50'
@@ -491,9 +504,10 @@ const BankConfigList = () => {
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
+              title={showFilters ? 'Hide filters' : 'Show filters'}
               className={`flex items-center gap-1 px-2 py-1 text-xs rounded border transition-colors ${
                 showFilters || hasActiveFilters()
-                  ? 'bg-blue-50 dark:bg-red-500/20 border-blue-200 dark:border-red-500/50 text-blue-700 dark:text-red-400'
+                  ? 'bg-red-50 dark:bg-red-500/20 border-red-200 dark:border-red-500/50 text-red-700 dark:text-red-400'
                   : 'bg-gray-100 dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700'
               }`}
             >
@@ -519,6 +533,7 @@ const BankConfigList = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search (Bank Code, Service Code)..."
+                  title="Search by bank code or service code"
                   className="w-full pl-8 pr-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
                 />
               </div>
@@ -529,6 +544,7 @@ const BankConfigList = () => {
                 value={bankCodeFilter}
                 onChange={(e) => setBankCodeFilter(e.target.value)}
                 placeholder="Filter by Bank Code..."
+                title="Filter configurations by bank code (e.g., 004, 014)"
                 className="px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
               />
 
@@ -538,6 +554,7 @@ const BankConfigList = () => {
                 value={serviceCodeFilter}
                 onChange={(e) => setServiceCodeFilter(e.target.value)}
                 placeholder="Filter by Service Code..."
+                title="Filter configurations by service code (e.g., PAYMENT_INQUIRY, ACCOUNT_VERIFICATION)"
                 className="px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
               />
             </div>
@@ -547,6 +564,7 @@ const BankConfigList = () => {
               <div className="flex justify-end">
                 <button
                   onClick={clearFilters}
+                  title="Clear all active filters"
                   className="flex items-center gap-1 px-3 py-1 bg-red-50 dark:bg-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/30 border border-red-200 dark:border-red-500/50 rounded text-xs text-red-700 dark:text-red-400 transition-colors"
                 >
                   <X className="w-3 h-3" />
@@ -563,7 +581,7 @@ const BankConfigList = () => {
       <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-gray-50 dark:bg-slate-900/50 text-gray-600 dark:text-slate-500 transition-colors">
+            <thead className="bg-gray-50 dark:bg-slate-800/50 text-gray-600 dark:text-slate-400 transition-colors">
               <tr>
                 <th className="px-5 py-3 font-semibold">No.</th>
                 <th className="px-5 py-3 font-semibold">Bank Code</th>
@@ -573,7 +591,7 @@ const BankConfigList = () => {
                 <th className="px-5 py-3 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50 text-gray-600 dark:text-slate-400 transition-colors">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-gray-600 dark:text-slate-400 transition-colors">
               {filteredConfigs.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-5 py-8 text-center text-gray-500 dark:text-slate-500 transition-colors">
@@ -624,6 +642,91 @@ const BankConfigList = () => {
           </table>
         </div>
       </div>
+      )}
+
+      {/* Toggle Bank Status Confirmation Modal */}
+      {toggleBankModal.isOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div 
+              className="fixed inset-0 bg-gray-500 dark:bg-slate-900 bg-opacity-75 dark:bg-opacity-75 transition-opacity"
+              onClick={() => setToggleBankModal({ isOpen: false, bank: null })}
+            ></div>
+
+            {/* Center modal */}
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            {/* Modal panel */}
+            <div className="relative inline-block align-bottom bg-white dark:bg-slate-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-200 dark:border-slate-700">
+              <div className="bg-white dark:bg-slate-900 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className={`mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 ${
+                    toggleBankModal.bank?.isActive 
+                      ? 'bg-red-100 dark:bg-red-900/30' 
+                      : 'bg-green-100 dark:bg-green-900/30'
+                  }`}>
+                    <Power className={`h-6 w-6 ${
+                      toggleBankModal.bank?.isActive 
+                        ? 'text-red-600 dark:text-red-400' 
+                        : 'text-green-600 dark:text-green-400'
+                    }`} />
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                      {toggleBankModal.bank?.isActive ? 'Disable Bank' : 'Enable Bank'}
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500 dark:text-slate-400">
+                        Are you sure you want to {toggleBankModal.bank?.isActive ? 'disable' : 'enable'}{' '}
+                        <span className="font-semibold text-gray-900 dark:text-white">
+                          {toggleBankModal.bank?.bankNameEng}
+                        </span>
+                        {' '}({toggleBankModal.bank?.bankNameThai})?
+                      </p>
+                      {toggleBankModal.bank?.isActive && (
+                        <p className="text-sm text-red-600 dark:text-red-400 mt-2">
+                          ⚠️ Disabling this bank will prevent it from being used for transactions.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                <button
+                  type="button"
+                  disabled={togglingBank === toggleBankModal.bank?.id}
+                  onClick={handleToggleBankConfirm}
+                  className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+                    toggleBankModal.bank?.isActive
+                      ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500 dark:bg-red-600 dark:hover:bg-red-700'
+                      : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 dark:bg-green-600 dark:hover:bg-green-700'
+                  }`}
+                >
+                  {togglingBank === toggleBankModal.bank?.id ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      {toggleBankModal.bank?.isActive ? 'Disable' : 'Enable'}
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  disabled={togglingBank === toggleBankModal.bank?.id}
+                  onClick={() => setToggleBankModal({ isOpen: false, bank: null })}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-slate-600 shadow-sm px-4 py-2 bg-white dark:bg-slate-800 text-base font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Delete Modal */}
