@@ -1,4 +1,4 @@
-import { useState } from 'react';
+ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Lock, User, AlertCircle, LogIn } from 'lucide-react';
@@ -116,6 +116,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
+              title="Sign in to your account"
               className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-lg shadow-red-600/20 flex items-center justify-center gap-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (

@@ -229,6 +229,7 @@ const BankConfigList = () => {
           </div>
           <button
             onClick={() => navigate('/bank-configs/create')}
+            title="Create new bank configuration"
             className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-lg shadow-red-600/20 transition"
           >
             <Plus className="w-4 h-4" />

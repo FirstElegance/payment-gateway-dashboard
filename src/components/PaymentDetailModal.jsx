@@ -170,6 +170,7 @@ const PaymentDetailModal = ({
               )}
               <button
                 onClick={onClose}
+                title="Close"
                 className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 hover:text-white transition"
               >
                 <X className="w-5 h-5" />
@@ -308,6 +309,7 @@ const PaymentDetailModal = ({
           <div className="px-6 py-4 border-t border-slate-700 bg-slate-800/50 flex justify-end flex-shrink-0">
             <button
               onClick={onClose}
+              title="Close modal"
               className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-md transition"
             >
               Close

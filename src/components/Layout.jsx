@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Settings, Home, LogOut, User, FileText, Wallet, ArrowLeftRight, Sun, Moon, QrCode, Users, Menu, X } from 'lucide-react';
+import { Settings, Home, LogOut, User, FileText, Wallet, ArrowLeftRight, Sun, Moon, QrCode, Users, Menu, X, RefreshCw, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFeatures } from '../contexts/FeatureContext';
+import { useAutoRefresh } from '../contexts/AutoRefreshContext';
 import { bankConfigAPI, transferConfigAPI } from '../services/api';
 
 /**
@@ -16,6 +17,8 @@ const Layout = ({ children }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const { features } = useFeatures();
+  const { intervalSeconds, setIntervalSeconds, isActive: isAutoRefreshActive } = useAutoRefresh();
+  const [autoRefreshDropdownOpen, setAutoRefreshDropdownOpen] = useState(false);
   const [profileName, setProfileName] = useState('profileName');
   const [businessConfig, setBusinessConfig] = useState(null);
   const [activeBanks, setActiveBanks] = useState([]);
@@ -74,6 +77,17 @@ const Layout = ({ children }) => {
   };
 
   
+  // Close auto refresh dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (autoRefreshDropdownOpen && !e.target.closest('.auto-refresh-dropdown')) {
+        setAutoRefreshDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [autoRefreshDropdownOpen]);
+
   // Debug: Log theme changes
   useEffect(() => {
     console.log('Layout: theme changed to', theme, 'isDark:', isDark);
@@ -114,13 +128,13 @@ const Layout = ({ children }) => {
       <header className="bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 sticky top-0 z-50 transition-colors shadow-sm">
         {/* Market Ticker - ซ่อนบนมือถือ แสดงบน Desktop */}
         <div className="hidden lg:flex bg-gray-50 dark:bg-slate-950 h-8 items-center border-b border-gray-100 dark:border-slate-800 overflow-x-auto overflow-y-hidden text-xs font-mono text-gray-500 dark:text-slate-400 transition-colors">
-          <div className="px-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold border-r border-gray-200 dark:border-slate-800 h-full flex items-center tracking-wider transition-colors whitespace-nowrap">
+          <div className="px-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold border-r border-gray-200 dark:border-slate-800 h-full flex items-center tracking-wider transition-colors whitespace-nowrap" title="Profile name">
             {profileName}
           </div>
           <div className="flex items-center px-4 gap-3 md:gap-6 whitespace-nowrap">
             {businessConfig && (
               <>
-                <span className="flex gap-1 md:gap-2 text-gray-600 dark:text-slate-300">
+                <span className="flex gap-1 md:gap-2 text-gray-600 dark:text-slate-300" title="Environment">
                   <Settings className="w-3.5 h-3.5 mt-0.5" />
                   <span className="hidden sm:inline">ENV</span>
                   <span className={`font-bold ${
@@ -129,7 +143,7 @@ const Layout = ({ children }) => {
                       : 'text-yellow-600 dark:text-yellow-400'
                   }`}>{businessConfig.scb || '-'}</span>
                 </span>
-                <span className="flex gap-1 md:gap-2 text-gray-600 dark:text-slate-300">
+                <span className="flex gap-1 md:gap-2 text-gray-600 dark:text-slate-300" title="Amount setting type">
                   <span className="hidden sm:inline">Amount</span>
                   <span className={`font-bold ${
                     businessConfig.amountSetting?.type === 'FIXED'
@@ -143,7 +157,7 @@ const Layout = ({ children }) => {
                 {businessConfig.transferMapping && (() => {
                   const filteredMappings = Object.entries(businessConfig.transferMapping).filter(([from, to]) => from !== to);
                   return filteredMappings.length > 0 && (
-                    <span className="hidden md:flex items-center gap-2 text-gray-600 dark:text-slate-300">
+                    <span className="hidden md:flex items-center gap-2 text-gray-600 dark:text-slate-300" title="Sell bank mapping">
                       <span className="whitespace-nowrap">Sell</span>
                       <span className="flex items-center gap-1.5 flex-wrap">
                         {filteredMappings.slice(0, 3).map(([from, to], index) => {
@@ -172,16 +186,16 @@ const Layout = ({ children }) => {
                     </span>
                   );
                 })()}
-                <span className="hidden lg:flex gap-2 text-gray-600 dark:text-slate-300">
+                <span className="hidden lg:flex gap-2 text-gray-600 dark:text-slate-300" title="KBANK service odd">
                   KBANK <span className="text-green-600 dark:text-green-400 font-bold">{businessConfig.kbankServiceOdd || '-'}</span>
-            </span>
+                </span>
                 {activeBanks.length > 0 && (
                   <>
                     <span className="text-gray-400 dark:text-slate-600">|</span>
                     {activeBanks.map((bank) => {
                       const iconPath = getBankIconPath(bank.bankCode);
                       return (
-                        <span key={bank.id} className="relative flex items-center">
+                        <span key={bank.id} className="relative flex items-center" title={bank.bankNameEng || bank.bankName || `Bank ${bank.bankCode}`}>
                           {iconPath ? (
                             <>
                               <img 
@@ -220,11 +234,12 @@ const Layout = ({ children }) => {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 transition-colors"
               aria-label="Toggle menu"
+              title={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0" title="ELEGANCE Payment Gateway - Home">
               <img 
                 src="https://www.elegance.co.th/wp-content/uploads/2025/08/cropped-LogoEleganceSiteIcon-32x32.png"
                 alt="ELEGANCE Logo"
@@ -237,7 +252,7 @@ const Layout = ({ children }) => {
             </div>
             
             {/* Desktop Navigation */}
-            <div className="hidden lg:block h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
+            <div className="hidden lg:block h-6 w-px bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
             <nav className="hidden lg:flex gap-1 flex-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
@@ -246,6 +261,7 @@ const Layout = ({ children }) => {
                   <Link
                     key={item.path}
                     to={item.path}
+                    title={`Go to ${item.label}`}
                     className={`px-4 py-1.5 rounded text-sm font-medium transition flex items-center gap-2 whitespace-nowrap ${
                       active
                         ? 'bg-red-600 text-white shadow-inner'
@@ -261,6 +277,69 @@ const Layout = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+            {/* Auto Refresh Dropdown */}
+            <div className="relative auto-refresh-dropdown">
+              <button
+                onClick={() => setAutoRefreshDropdownOpen(!autoRefreshDropdownOpen)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition ${
+                  isAutoRefreshActive
+                    ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-400'
+                    : 'bg-gray-50 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700'
+                }`}
+                title="Auto refresh"
+              >
+                <RefreshCw className="w-4 h-4" />
+                <span className="hidden sm:inline">
+                  {intervalSeconds ? `Auto ${intervalSeconds}s` : 'Auto refresh close'}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+              {autoRefreshDropdownOpen && (
+                <div className="absolute right-0 mt-1 py-1 w-44 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg z-50">
+                  <button
+                    onClick={() => { setIntervalSeconds(3); setAutoRefreshDropdownOpen(false); }}
+                    title="Refresh page every 3 seconds"
+                    className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 transition ${
+                      intervalSeconds === 3 ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Auto refresh 3s
+                  </button>
+                  <button
+                    onClick={() => { setIntervalSeconds(5); setAutoRefreshDropdownOpen(false); }}
+                    title="Refresh page every 5 seconds"
+                    className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 transition ${
+                      intervalSeconds === 5 ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Auto refresh 5s
+                  </button>
+                  <button
+                    onClick={() => { setIntervalSeconds(10); setAutoRefreshDropdownOpen(false); }}
+                    title="Refresh page every 10 seconds"
+                    className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 transition ${
+                      intervalSeconds === 10 ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-medium' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Auto refresh 10s
+                  </button>
+                  <div className="border-t border-gray-200 dark:border-slate-700 my-1" />
+                  <button
+                    onClick={() => { setIntervalSeconds(null); setAutoRefreshDropdownOpen(false); }}
+                    title="Disable auto refresh"
+                    className={`w-full px-4 py-2 text-left text-sm flex items-center gap-2 transition ${
+                      !intervalSeconds ? 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 font-medium' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Theme Toggle Button */}
             <button
               onClick={(e) => {
@@ -290,9 +369,9 @@ const Layout = ({ children }) => {
             {/* User Info & Logout */}
             {user && (
               <>
-                <div className="hidden md:block h-6 w-px bg-gray-200 dark:bg-slate-700"></div>
+                <div className="hidden md:block h-6 w-px bg-gray-200 dark:bg-slate-700" aria-hidden="true"></div>
                 <div className="flex items-center gap-2">
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors" title={`Logged in as ${user.name || user.username}`}>
                     <User className="w-4 h-4 text-gray-600 dark:text-slate-400" />
                     <span className="text-xs text-gray-700 dark:text-slate-300 hidden md:inline">{user.name || user.username}</span>
                   </div>
@@ -423,6 +502,7 @@ const Layout = ({ children }) => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
+                    title={`Go to ${item.label}`}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
                       active
                         ? 'bg-red-600 text-white shadow-sm'

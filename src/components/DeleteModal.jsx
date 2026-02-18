@@ -33,6 +33,7 @@ const DeleteModal = ({
             <button
               onClick={onClose}
               disabled={isLoading}
+              title="Close"
               className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 disabled:opacity-50 transition-colors"
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -70,6 +71,7 @@ const DeleteModal = ({
             <button
               onClick={onClose}
               disabled={isLoading}
+              title="Cancel and close"
               className="px-4 py-2 border border-gray-300 dark:border-slate-700 rounded-md text-gray-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Cancel
@@ -77,6 +79,7 @@ const DeleteModal = ({
             <button
               onClick={onConfirm}
               disabled={isLoading}
+              title="Confirm delete"
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
             >
               {isLoading && (

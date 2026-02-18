@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFeatures } from '../contexts/FeatureContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { paymentRegistrationsAPI, transferConfigAPI, fundTransfersAPI, bankRegistrationsAPI, qrPaymentAPI } from '../services/api';
+import { paymentRegistrationsAPI, transferConfigAPI, fundTransfersAPI, bankRegistrationsAPI, qrPaymentAPI, membersAPI } from '../services/api';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import TransactionFlowTVChart from './TransactionFlowTVChart';
 import AppLoading from './AppLoading';
@@ -41,6 +41,7 @@ import {
   RotateCcw,
   Maximize2,
   Minimize2,
+  Users,
 } from 'lucide-react';
 import TreasuryMonitor from './TreasuryMonitor';
 import QrPaymentDetailModal from './QrPaymentDetailModal';
@@ -184,6 +185,37 @@ const Dashboard = () => {
     to: '',
   });
 
+  const [newMembersTodayCount, setNewMembersTodayCount] = useState(0);
+
+  // Chart date range derived from dropdown (for fallback filter)
+  const chartDateRangeForFallback = useMemo(() => {
+    const toYmd = (d) => {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+    const now = new Date();
+    if (transactionFlowRange.preset === 'today') {
+      const ymd = toYmd(now);
+      return { dateFrom: ymd, dateTo: ymd };
+    }
+    if (transactionFlowRange.preset === '7d') {
+      const start = new Date(now);
+      start.setDate(now.getDate() - 6);
+      return { dateFrom: toYmd(start), dateTo: toYmd(now) };
+    }
+    if (transactionFlowRange.preset === '30d') {
+      const start = new Date(now);
+      start.setDate(now.getDate() - 29);
+      return { dateFrom: toYmd(start), dateTo: toYmd(now) };
+    }
+    return {
+      dateFrom: transactionFlowRange.from || '',
+      dateTo: transactionFlowRange.to || '',
+    };
+  }, [transactionFlowRange.preset, transactionFlowRange.from, transactionFlowRange.to]);
+
   const TransactionFlowLoadingBadge = () => (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
       <AppLoading size="md" text="Loading chart…" />
@@ -203,11 +235,12 @@ const Dashboard = () => {
   // Selected QR Payment ID for detail modal
   const [selectedQrPaymentId, setSelectedQrPaymentId] = useState(null);
   
-  // Load initial data on mount - load all data
+  // Load initial data on mount - load payments, fund transfers, and bank list (so chart shows both Payments + Fund Transfers)
   useEffect(() => {
     if (!hasMounted) {
       setHasMounted(true);
-      loadDashboardData(); // Always load all data
+      loadDashboardData(); // Payments
+      loadFundTransfersData(); // Fund transfers (for chart combo + fund-transfers tab)
       loadBankList();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,6 +275,28 @@ const Dashboard = () => {
     
     loadStatsForNetKPI();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Load new members count for today
+  useEffect(() => {
+    const loadNewMembersToday = async () => {
+      try {
+        const response = await membersAPI.getAll();
+        const members = Array.isArray(response) ? response : [];
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
+        const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+        const count = members.filter((m) => {
+          const d = m?.createdAt ? new Date(m.createdAt) : null;
+          return d && d >= todayStart && d <= todayEnd;
+        }).length;
+        setNewMembersTodayCount(count);
+      } catch (err) {
+        console.error('Error loading new members today:', err);
+        setNewMembersTodayCount(0);
+      }
+    };
+    loadNewMembersToday();
   }, []);
 
   // Handle click outside date pickers to close them
@@ -328,13 +383,17 @@ const Dashboard = () => {
       };
 
       const chartRange = getChartDateRange();
+      // Transaction Flow uses ONLY the chart dropdown range (Today / 7d / 30d / custom), not table filters.
+      // So when user selects "Today", the chart shows only today's data.
+      const chartDateFrom = chartRange.dateFrom || '';
+      const chartDateTo = chartRange.dateTo || '';
 
       const buildPaymentsFilters = () => ({
         bankCode: filters.bank,
         status: filters.status,
         search: filters.search,
-        dateFrom: chartRange.dateFrom || filters.dateFrom,
-        dateTo: chartRange.dateTo || filters.dateTo,
+        dateFrom: chartDateFrom,
+        dateTo: chartDateTo,
         amountMin: filters.amountMin,
         amountMax: filters.amountMax,
       });
@@ -343,8 +402,8 @@ const Dashboard = () => {
         bankCode: fundTransferFilters.bank,
         status: fundTransferFilters.status,
         search: fundTransferFilters.search,
-        dateFrom: chartRange.dateFrom || fundTransferFilters.dateFrom,
-        dateTo: chartRange.dateTo || fundTransferFilters.dateTo,
+        dateFrom: chartDateFrom,
+        dateTo: chartDateTo,
         amountMin: fundTransferFilters.amountMin,
         amountMax: fundTransferFilters.amountMax,
       });
@@ -375,7 +434,9 @@ const Dashboard = () => {
               status: r?.status,
               transferStatus: r?.transferStatus,
               inquiryStatus: r?.inquiryStatus,
-              // identifiers / "who" for chart tooltip
+              bankCode: r?.bankCode ?? r?.bank?.bankCode,
+              bankName: r?.bankName ?? r?.bank?.bankName,
+              // identifiers / "who" for chart tooltip and search filter
               ref: r?.ref,
               ref1: r?.ref1,
               ref2: r?.ref2,
@@ -432,15 +493,17 @@ const Dashboard = () => {
       }
 
       // Ensure date range always works even if the backend ignores dateFrom/dateTo:
-      // apply date filtering client-side using createdAt (inclusive range).
+      // apply chart range (Today / 7d / 30d / custom) to ALL rows so "Today" really shows only today.
       let filtered = collected;
-      if (chartRange.dateFrom || chartRange.dateTo) {
-        const startMs = chartRange.dateFrom
-          ? new Date(`${chartRange.dateFrom}T00:00:00`).getTime()
-          : null;
-        const endMs = chartRange.dateTo
-          ? new Date(`${chartRange.dateTo}T23:59:59.999`).getTime()
-          : null;
+      const toMs = (dateStr, endOfDay) => {
+        if (!dateStr) return null;
+        return endOfDay
+          ? new Date(`${dateStr}T23:59:59.999`).getTime()
+          : new Date(`${dateStr}T00:00:00`).getTime();
+      };
+      if (chartDateFrom || chartDateTo) {
+        const startMs = toMs(chartDateFrom, false);
+        const endMs = toMs(chartDateTo, true);
         filtered = collected.filter((r) => {
           const t = r?.createdAt ? new Date(r.createdAt).getTime() : NaN;
           if (!Number.isFinite(t)) return false;
@@ -448,8 +511,59 @@ const Dashboard = () => {
           if (endMs !== null && t > endMs) return false;
           return true;
         });
-        console.log('📈 Transaction Flow after client date filter:', filtered.length, 'rows');
+        console.log('📈 Transaction Flow after chart date filter:', chartDateFrom, '→', chartDateTo, 'rows:', filtered.length);
       }
+
+      // Apply table filters client-side so Transaction Flow shows the same set as the table
+      // (backend may ignore filter params, so we filter here)
+      const normBank = (v) => (v == null || v === '' ? '' : String(v).trim().replace(/^0+/, '') || '0');
+      filtered = filtered.filter((r) => {
+        if (r?.flowType === 'payments') {
+          if (filters.bank && filters.bank !== 'all') {
+            if (normBank(r.bankCode) !== normBank(filters.bank)) return false;
+          }
+          if (filters.status && filters.status !== 'all') {
+            const st = (r.status || r.inquiryStatus || '').toLowerCase();
+            if (st !== String(filters.status).toLowerCase()) return false;
+          }
+          if (filters.search) {
+            const s = (filters.search || '').toLowerCase();
+            const refs = [r.ref, r.ref1, r.ref2, r.internalRef, r.rsTransID, r.transactionId, r.id].filter(Boolean).map(String);
+            const match = refs.some((ref) => ref.toLowerCase().includes(s)) ||
+              (r.member?.name && String(r.member.name).toLowerCase().includes(s)) ||
+              (r.member?.citizenId && String(r.member.citizenId).includes(s));
+            if (!match) return false;
+          }
+          const amount = parseFloat(r.amount) || 0;
+          if (filters.amountMin != null && filters.amountMin !== '' && amount < Number(filters.amountMin)) return false;
+          if (filters.amountMax != null && filters.amountMax !== '' && amount > Number(filters.amountMax)) return false;
+          return true;
+        }
+        if (r?.flowType === 'fund-transfers') {
+          if (fundTransferFilters.bank && fundTransferFilters.bank !== 'all') {
+            if (normBank(r.bankCode) !== normBank(fundTransferFilters.bank)) return false;
+          }
+          if (fundTransferFilters.status && fundTransferFilters.status !== 'all') {
+            const st = (r.transferStatus || r.status || r.inquiryStatus || '').toLowerCase();
+            if (st !== String(fundTransferFilters.status).toLowerCase()) return false;
+          }
+          if (fundTransferFilters.search) {
+            const s = (fundTransferFilters.search || '').toLowerCase();
+            const refs = [r.ref, r.ref1, r.ref2, r.internalRef, r.rsTransID, r.transactionId, r.id].filter(Boolean).map(String);
+            const match = refs.some((ref) => ref.toLowerCase().includes(s)) ||
+              (r.member?.name && String(r.member.name).toLowerCase().includes(s)) ||
+              (r.member?.citizenId && String(r.member.citizenId).includes(s));
+            if (!match) return false;
+          }
+          const amount = parseFloat(r.amount) || 0;
+          if (fundTransferFilters.amountMin != null && fundTransferFilters.amountMin !== '' && amount < Number(fundTransferFilters.amountMin)) return false;
+          if (fundTransferFilters.amountMax != null && fundTransferFilters.amountMax !== '' && amount > Number(fundTransferFilters.amountMax)) return false;
+          return true;
+        }
+        // qr-payments: no table filters applied in combined view
+        return true;
+      });
+      console.log('📈 Transaction Flow after table filter:', filtered.length, 'rows');
 
       setTransactionFlowSource(filtered);
     } catch (err) {
@@ -462,9 +576,9 @@ const Dashboard = () => {
     }
   };
   
-  // Load fund transfers when switching to fund-transfers tab (only if not loaded)
+  // Load fund transfers when on payments OR fund-transfers tab (so chart shows both Payments + Fund Transfers combined)
   useEffect(() => {
-    if (activeTab === 'fund-transfers' && allFundTransfers.length === 0) {
+    if ((activeTab === 'payments' || activeTab === 'fund-transfers') && allFundTransfers.length === 0) {
       loadFundTransfersData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1521,42 +1635,51 @@ const calculateNetTotalPayments = () => {
     return status === 'pending' || status === 'processing' || status === 'in_progress';
   };
 
-  // Chart data - use appropriate dataset based on active tab.
-  // Use a dedicated dataset (loaded across all pages) so the chart doesn't follow pagination.
+  // Chart data - use transactionFlowSource when available; otherwise fallback to table data filtered by chart range.
   const getChartDataSource = () => {
-    // Prefer the dedicated dataset (loaded across all pages) so the chart doesn't follow pagination.
-    const base = Array.isArray(transactionFlowSource) && transactionFlowSource.length > 0
-      ? transactionFlowSource
-      : (() => {
-          let dataSource = [];
-    switch (activeTab) {
-      case 'fund-transfers':
-              dataSource = allFundTransfers;
-              break;
-      case 'bank-registrations':
-              dataSource = allBankRegistrations;
-              break;
-      case 'qr-payments':
-              dataSource = allQrPayments;
-              break;
-      case 'payments':
-      default:
-              dataSource = allPayments;
-              break;
-    }
-          return dataSource;
-        })();
+    const dedicated = Array.isArray(transactionFlowSource) ? transactionFlowSource : [];
+    if (dedicated.length > 0) return dedicated;
 
-    return Array.isArray(base) ? base : [];
+    // Fallback: filter table data by same chart range (Today / 7d / 30d) so chart is never "whole month" when Today is selected
+    const { dateFrom, dateTo } = chartDateRangeForFallback;
+    const toMs = (str, endOfDay) => {
+      if (!str) return null;
+      return endOfDay ? new Date(`${str}T23:59:59.999`).getTime() : new Date(`${str}T00:00:00`).getTime();
+    };
+    const inRange = (createdAt) => {
+      const t = createdAt ? new Date(createdAt).getTime() : NaN;
+      if (!Number.isFinite(t)) return false;
+      if (dateFrom && t < toMs(dateFrom, false)) return false;
+      if (dateTo && t > toMs(dateTo, true)) return false;
+      return true;
+    };
+
+    const withFlowType = (arr, flowType) =>
+      (Array.isArray(arr) ? arr : [])
+        .filter((r) => inRange(r?.createdAt))
+        .map((r) => ({ ...r, flowType }));
+
+    if (activeTab === 'payments' || activeTab === 'fund-transfers') {
+      const payments = withFlowType(allPayments, 'payments');
+      const transfers = withFlowType(allFundTransfers, 'fund-transfers');
+      return [...payments, ...transfers];
+    }
+    if (activeTab === 'qr-payments') {
+      return withFlowType(allQrPayments, 'qr-payments');
+    }
+    return [];
   };
 
   const chartDataSource = getChartDataSource();
-  // Sort by createdAt ascending so labels and datasets line up consistently
-  const chartDataSorted = [...chartDataSource].sort((a, b) => {
-    const ta = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
-    const tb = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
-    return ta - tb;
-  });
+  // Sort by createdAt ascending so Transaction Flow x-axis shows chronological order (left = oldest, right = newest)
+  const chartDataSorted = useMemo(() => {
+    const arr = Array.isArray(chartDataSource) ? [...chartDataSource] : [];
+    return arr.sort((a, b) => {
+      const ta = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const tb = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return ta - tb;
+    });
+  }, [chartDataSource]);
   // NOTE: timeSeriesData no longer used (Transaction Flow uses TradingView-style chart).
   
   // Map สีตาม bank name โดยตรง (ไม่ใช้ index)
@@ -1654,10 +1777,10 @@ const calculateNetTotalPayments = () => {
     <div className="p-4 md:p-6 w-full space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* KPI Cards */}
       <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
-        activeTab === 'bank-registrations' ? 'lg:grid-cols-4' : 'lg:grid-cols-5'
+        activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
       }`}>
         {/* Net Total Payments - Always shown regardless of tab */}
-        <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm">
+        <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Net Total = Sell (Fund Transfers) - Buy (Payments)">
           <div className="flex justify-between items-start mb-2">
             <div>
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">
@@ -1682,7 +1805,7 @@ const calculateNetTotalPayments = () => {
         </div>
 
         {/* Success Rate */}
-        <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm">
+        <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Percentage of successful transactions">
           <div className="flex justify-between items-start mb-2">
             <div>
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Success Rate</div>
@@ -1698,7 +1821,7 @@ const calculateNetTotalPayments = () => {
 
         {/* Net Liquidity - Hidden for Bank Registrations */}
         {activeTab !== 'bank-registrations' && (
-          <div className="bg-blue-50 dark:bg-slate-800/50 backdrop-blur-sm border border-blue-100 dark:border-slate-800 p-4 rounded-lg hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors shadow-sm">
+          <div className="bg-blue-50 dark:bg-slate-800/50 backdrop-blur-sm border border-blue-100 dark:border-slate-800 p-4 rounded-lg hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors shadow-sm" title="Cash In - Cash Out">
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-[10px] text-blue-700 dark:text-blue-300 font-bold uppercase tracking-wider transition-colors">Net Liquidity</div>
@@ -1715,43 +1838,21 @@ const calculateNetTotalPayments = () => {
           </div>
         )}
         
-        {/* Failed Count - Show for all tabs */}
-          <div className="bg-red-50 dark:bg-slate-800/50 backdrop-blur-sm border border-red-100 dark:border-slate-800 p-4 rounded-lg hover:border-red-300 dark:hover:border-red-500/50 transition-colors shadow-sm">
-            <div className="flex justify-between items-start mb-2">
-              <div>
-              <div className="text-[10px] text-red-700 dark:text-red-300 font-bold uppercase tracking-wider transition-colors">
-                {activeTab === 'bank-registrations' ? 'Failed Registrations' : 
-                 activeTab === 'fund-transfers' ? 'Failed Transfers' :
-                 activeTab === 'qr-payments' ? 'Failed QR Payments' : 'Failed Payments'}
-              </div>
-                <div className="text-2xl font-bold text-red-900 dark:text-red-100 font-mono mt-1 transition-colors">
-                  {metrics.failedCount}
-                </div>
-              </div>
-              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
-            </div>
-            <div className="text-[10px] text-gray-600 dark:text-slate-400 mt-3 border-t border-red-100 dark:border-slate-700/50 pt-2 transition-colors">
-            {activeTab === 'bank-registrations' 
-              ? 'Registration attempts that failed' 
-              : 'Transactions that failed to process'}
-            </div>
-          </div>
-
-        {/* Pending */}
-        <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-yellow-400 dark:hover:border-yellow-500/50 transition-colors shadow-sm">
+        {/* New Members Today */}
+        <div className="bg-emerald-50 dark:bg-slate-800/50 backdrop-blur-sm border border-emerald-100 dark:border-slate-800 p-4 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-colors shadow-sm" title="Number of new members registered today">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">
-                {activeTab === 'bank-registrations' ? 'Pending Review' : 'Pending Settlement'}
+              <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider transition-colors">
+                New Members Today
               </div>
-              <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 font-mono mt-1 transition-colors">{metrics.pendingCount}</div>
+              <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100 font-mono mt-1 transition-colors">
+                {newMembersTodayCount}
+              </div>
             </div>
-            <AlertTriangle className="w-5 h-5 text-yellow-500 dark:text-yellow-500" />
+            <Users className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700/50 pt-2 mt-2 transition-colors">
-            {activeTab === 'bank-registrations' 
-              ? 'Registrations awaiting approval' 
-              : 'Transactions awaiting settlement'}
+          <div className="text-[10px] text-gray-600 dark:text-slate-400 mt-3 border-t border-emerald-100 dark:border-slate-700/50 pt-2 transition-colors">
+            New members registered today
           </div>
         </div>
       </div>
@@ -1918,7 +2019,7 @@ const calculateNetTotalPayments = () => {
               ) : (
                 <TransactionFlowTVChart
                   ref={transactionFlowChartRef}
-                  rows={chartDataSource}
+                  rows={chartDataSorted}
                   getStatus={getStatusForChart}
                   isSuccess={isSuccessStatus}
                   isPending={isPendingStatus}
@@ -2010,6 +2111,7 @@ const calculateNetTotalPayments = () => {
           <div className="flex gap-2 mb-3">
             <button
               onClick={() => setActiveTab('payments')}
+              title="View Payments"
               className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
                 activeTab === 'payments'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
@@ -2020,6 +2122,7 @@ const calculateNetTotalPayments = () => {
             </button>
             <button
               onClick={() => setActiveTab('fund-transfers')}
+              title="View Fund Transfers"
               className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
                 activeTab === 'fund-transfers'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
@@ -2030,6 +2133,7 @@ const calculateNetTotalPayments = () => {
             </button>
             <button
               onClick={() => setActiveTab('bank-registrations')}
+              title="View Bank Registrations"
               className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
                 activeTab === 'bank-registrations'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
@@ -2042,6 +2146,7 @@ const calculateNetTotalPayments = () => {
             {features.qrPayment && (
             <button
               onClick={() => setActiveTab('qr-payments')}
+              title="View QR Payments"
               className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
                 activeTab === 'qr-payments'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
@@ -2074,6 +2179,7 @@ const calculateNetTotalPayments = () => {
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
+                title={showFilters ? 'Hide filters' : 'Show filters'}
                 className={`flex items-center gap-1 px-2 py-1 text-xs rounded border transition ${
                   showFilters || hasActiveFilters()
                     ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-500/20 dark:border-blue-500/50 dark:text-blue-400'
@@ -2318,6 +2424,7 @@ onSelect={(date) => {
                       activeTab === 'qr-payments' ? clearQrPaymentFilters :
                       clearBankRegistrationFilters
                     }
+                    title="Clear all filters"
                     className="flex items-center gap-1 px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded text-xs text-red-400 transition"
                   >
                     <X className="w-3 h-3" />
@@ -3040,7 +3147,7 @@ onSelect={(date) => {
                 ) : (
                   <TransactionFlowTVChart
                     ref={transactionFlowChartRef}
-                    rows={chartDataSource}
+                    rows={chartDataSorted}
                     getStatus={getStatusForChart}
                     isSuccess={isSuccessStatus}
                     isPending={isPendingStatus}

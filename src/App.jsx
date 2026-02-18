@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { FeatureProvider } from './contexts/FeatureContext';
+import { AutoRefreshProvider } from './contexts/AutoRefreshContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -35,6 +36,7 @@ function App() {
             path="/*"
             element={
               <ProtectedRoute>
+                <AutoRefreshProvider>
                 <Layout>
                   <Routes>
                     {/* Dashboard - Main Page */}
@@ -71,6 +73,7 @@ function App() {
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </Layout>
+                </AutoRefreshProvider>
               </ProtectedRoute>
             }
           />

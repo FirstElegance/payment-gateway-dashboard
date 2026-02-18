@@ -191,6 +191,7 @@ const MemberDetailModal = ({
               )}
               <button
                 onClick={onClose}
+                title="Close"
                 className="p-2 bg-slate-800 hover:bg-slate-700 rounded text-slate-300 hover:text-white transition"
               >
                 <X className="w-5 h-5" />

@@ -108,6 +108,7 @@ const FundTransferDetailModal = ({
           <h2 className="text-lg font-bold text-slate-900 dark:text-white transition-colors">Fund Transfer Details</h2>
           <button
             onClick={onClose}
+            title="Close"
             className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors"
           >
             <X className="w-5 h-5 text-slate-600 dark:text-slate-400 transition-colors" />

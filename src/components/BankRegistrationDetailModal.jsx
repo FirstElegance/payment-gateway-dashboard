@@ -119,6 +119,7 @@ const BankRegistrationDetailModal = ({
           </div>
           <button
             onClick={onClose}
+            title="Close"
             className="p-2 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           >
             <X className="w-5 h-5" />

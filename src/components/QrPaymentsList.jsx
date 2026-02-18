@@ -269,6 +269,7 @@ const QrPaymentsList = () => {
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
+                title={showFilters ? 'Hide filters' : 'Show filters'}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
                   showFilters || hasActiveFilters()
                     ? 'bg-red-600 text-white'
@@ -286,6 +287,7 @@ const QrPaymentsList = () => {
               {hasActiveFilters() && (
                 <button
                   onClick={clearFilters}
+                  title="Clear all filters"
                   className="px-4 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                 >
                   <X className="w-4 h-4" />
@@ -458,6 +460,7 @@ const QrPaymentsList = () => {
                       <button
                         onClick={() => handlePageChange(pagination.page - 1)}
                         disabled={pagination.page === 1}
+                        title="Previous page"
                         className="p-2 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         <ChevronLeft className="w-4 h-4" />
@@ -468,6 +471,7 @@ const QrPaymentsList = () => {
                       <button
                         onClick={() => handlePageChange(pagination.page + 1)}
                         disabled={pagination.page >= pagination.totalPages}
+                        title="Next page"
                         className="p-2 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         <ChevronRight className="w-4 h-4" />
