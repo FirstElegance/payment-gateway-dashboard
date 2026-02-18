@@ -290,7 +290,7 @@ const Layout = ({ children }) => {
               >
                 <RefreshCw className="w-4 h-4" />
                 <span className="hidden sm:inline">
-                  {intervalSeconds ? `Auto ${intervalSeconds}s` : 'Auto refresh close'}
+                  {intervalSeconds ? `Auto ${intervalSeconds}s` : 'Auto refresh off'}
                 </span>
                 <ChevronDown className="w-3.5 h-3.5" />
               </button>
