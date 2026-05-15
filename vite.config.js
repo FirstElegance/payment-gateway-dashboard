@@ -13,23 +13,46 @@ export default defineConfig(({ mode }) => {
   };
   const normalizedToken = normalizeToken(apiAuthToken);
 
+  const proxyOptions = {
+    target: apiBaseUrl,
+    changeOrigin: true,
+    secure: false,
+    bypass(req) {
+      const url = req.url?.split("?")[0] ?? "";
+
+      // Vite HMR / internal
+      if (url.startsWith("/@") || url.includes("node_modules")) {
+        return url;
+      }
+
+      // Static assets (js, css, images, fonts, …)
+      if (/\.[a-zA-Z0-9]+$/.test(url)) {
+        return url;
+      }
+
+      // Browser navigation → SPA (e.g. /bank-configs, /wallet, /members)
+      if (req.headers.accept?.includes("text/html")) {
+        return url;
+      }
+
+      // Everything else (axios/fetch API calls) → backend
+      return null;
+    },
+    ...(normalizedToken && {
+      configure: (proxy) => {
+        proxy.on("proxyReq", (proxyReq) => {
+          proxyReq.setHeader("Authorization", normalizedToken);
+        });
+      },
+    }),
+  };
+
   return {
     plugins: [react()],
     server: {
       proxy: {
-        "/api": {
-          target: apiBaseUrl,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path.replace(/^\/api/, ""),
-          ...(normalizedToken && {
-            configure: (proxy) => {
-              proxy.on("proxyReq", (proxyReq) => {
-                proxyReq.setHeader("Authorization", normalizedToken);
-              });
-            },
-          }),
-        },
+        // All API paths — no /api prefix; bypass keeps SPA routes on Vite
+        "^/(?!@|node_modules|src/).*": proxyOptions,
       },
     },
   };

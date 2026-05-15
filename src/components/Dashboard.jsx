@@ -98,7 +98,7 @@ const Dashboard = () => {
   const [transactionFlowFromPickerOpen, setTransactionFlowFromPickerOpen] = useState(false);
   const [transactionFlowToPickerOpen, setTransactionFlowToPickerOpen] = useState(false);
   const transactionFlowDatePickerRef = useRef(null);
-  
+
   // Fund Transfers states
   const [fundTransfers, setFundTransfers] = useState([]);
   const [allFundTransfers, setAllFundTransfers] = useState([]);
@@ -119,7 +119,7 @@ const Dashboard = () => {
     amountMin: '',
     amountMax: '',
   });
-  
+
   // Bank Registrations states
   const [bankRegistrations, setBankRegistrations] = useState([]);
   const [allBankRegistrations, setAllBankRegistrations] = useState([]);
@@ -138,7 +138,7 @@ const Dashboard = () => {
     dateFrom: '',
     dateTo: '',
   });
-  
+
   // QR Payments states
   const [qrPayments, setQrPayments] = useState([]);
   const [allQrPayments, setAllQrPayments] = useState([]);
@@ -157,7 +157,7 @@ const Dashboard = () => {
     amountMin: '',
     amountMax: '',
   });
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
@@ -232,10 +232,10 @@ const Dashboard = () => {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [transactionFlowFullscreen]);
-  
+
   // Selected QR Payment ID for detail modal
   const [selectedQrPaymentId, setSelectedQrPaymentId] = useState(null);
-  
+
   // Load initial data on mount - load payments, fund transfers, and bank list (so chart shows both Payments + Fund Transfers)
   useEffect(() => {
     if (!hasMounted) {
@@ -273,7 +273,7 @@ const Dashboard = () => {
         console.error('Error loading stats for Net KPI:', err);
       }
     };
-    
+
     loadStatsForNetKPI();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -284,10 +284,10 @@ const Dashboard = () => {
       try {
         const response = await membersAPI.getAll();
         const members = Array.isArray(response) ? response : [];
-        
+
         // จำนวนสมาชิกทั้งหมด
         setTotalMembersCount(members.length);
-        
+
         // จำนวนสมาชิกใหม่วันนี้
         const today = new Date();
         const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0);
@@ -582,7 +582,7 @@ const Dashboard = () => {
       }
     }
   };
-  
+
   // Load fund transfers when on payments OR fund-transfers tab (so chart shows both Payments + Fund Transfers combined)
   useEffect(() => {
     if ((activeTab === 'payments' || activeTab === 'fund-transfers') && allFundTransfers.length === 0) {
@@ -617,7 +617,7 @@ const Dashboard = () => {
     fundTransferFilters.amountMin,
     fundTransferFilters.amountMax,
   ]);
-  
+
   // Fund Transfers: reset to page 1 when filters change (client-side filtering)
   useEffect(() => {
     if (activeTab === 'fund-transfers') {
@@ -633,14 +633,14 @@ const Dashboard = () => {
     fundTransferFilters.amountMin,
     fundTransferFilters.amountMax,
   ]);
-  
+
   // Reload when payments pagination changes — skip (client-side pagination)
   useEffect(() => {
     if (activeTab === 'payments') return;
     if (hasPaymentsInitialLoad) loadDashboardData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.page]);
-  
+
   // Payments: reset to page 1 when filters change (client-side filtering)
   useEffect(() => {
     if (activeTab === 'payments') {
@@ -856,7 +856,7 @@ const Dashboard = () => {
     bankRegistrationPagination.page,
     bankRegistrationPagination.limit,
   ]);
-  
+
   // Load bank registrations when switching to bank-registrations tab (only if not loaded)
   useEffect(() => {
     if (activeTab === 'bank-registrations' && allBankRegistrations.length === 0) {
@@ -878,7 +878,7 @@ const Dashboard = () => {
     bankRegistrationFilters.dateFrom,
     bankRegistrationFilters.dateTo,
   ]);
-  
+
   // Load QR payments when switching to qr-payments tab (only if not loaded)
   useEffect(() => {
     if (activeTab === 'qr-payments' && allQrPayments.length === 0) {
@@ -919,7 +919,7 @@ const Dashboard = () => {
       setHasFundTransfersInitialLoad(true);
     }
   };
-  
+
   const loadBankRegistrationsData = async () => {
     try {
       setTableLoading(true);
@@ -948,14 +948,14 @@ const Dashboard = () => {
       setHasBankRegistrationsInitialLoad(true);
     }
   };
-  
+
   const loadQrPaymentsData = async () => {
     try {
       // Use table loading instead of global loading to avoid reloading entire page
       if (allQrPayments.length === 0) {
         setTableLoading(true);
       }
-      
+
       // Load ALL data for client-side pagination/filtering (no limit)
       // Backend must support ?all=true parameter
       const response = await qrPaymentAPI.getAll(1, 10, true);
@@ -989,10 +989,10 @@ const Dashboard = () => {
 
   // Note: Fund Transfers now use server-side filtering and pagination
   // No client-side filtering needed
-  
+
   // Note: Bank Registrations now use server-side filtering and pagination
   // No client-side filtering needed
-  
+
   // Store filtered QR payments (without pagination)
   const [filteredQrPayments, setFilteredQrPayments] = useState([]);
 
@@ -1002,7 +1002,7 @@ const Dashboard = () => {
       setFilteredQrPayments([]);
       return;
     }
-    
+
     const filtered = allQrPayments.filter((qrPayment) => {
       // Search filter
       if (qrPaymentFilters.search) {
@@ -1067,14 +1067,14 @@ const Dashboard = () => {
       totalPages: Math.ceil(filtered.length / prev.limit),
     }));
   }, [qrPaymentFilters, allQrPayments, activeTab]);
-  
+
   // Apply pagination to filtered QR payments
   useEffect(() => {
     if (activeTab !== 'qr-payments') return;
 
     const filteredTotal = filteredQrPayments.length;
     const totalPages = Math.ceil(filteredTotal / qrPaymentPagination.limit) || 1;
-    
+
     // Reset to page 1 if current page exceeds total pages
     let currentPage = qrPaymentPagination.page;
     if (currentPage > totalPages && totalPages > 0) {
@@ -1144,7 +1144,7 @@ const Dashboard = () => {
     } else {
       currentFilters = bankRegistrationFilters;
     }
-    
+
     return (
       currentFilters.search ||
       currentFilters.status !== 'all' ||
@@ -1167,7 +1167,7 @@ const Dashboard = () => {
       amountMax: '',
     });
   };
-  
+
   const clearBankRegistrationFilters = () => {
     setBankRegistrationFilters({
       search: '',
@@ -1177,7 +1177,7 @@ const Dashboard = () => {
       dateTo: '',
     });
   };
-  
+
   const clearQrPaymentFilters = () => {
     setQrPaymentFilters({
       search: '',
@@ -1193,14 +1193,14 @@ const Dashboard = () => {
   const loadDashboardData = async () => {
     try {
       setTableLoading(true);
-      
+
       // Load all payments (no filters) for client-side filtering — backend may not support filter params
       const paymentFilters = {};
-      
+
       // Try to load stats from API, fallback to all data if not available
       let statsResponse = null;
       let allDataForMetrics = [];
-      
+
       try {
         statsResponse = await paymentRegistrationsAPI.getStats();
         setPaymentStats(statsResponse);
@@ -1210,10 +1210,10 @@ const Dashboard = () => {
         // If stats API fails, load all data for metrics calculation
         try {
           const allDataResponse = await paymentRegistrationsAPI.getAll(1, 10000, {});
-          allDataForMetrics = Array.isArray(allDataResponse?.data) 
-            ? allDataResponse.data 
-            : Array.isArray(allDataResponse) 
-              ? allDataResponse 
+          allDataForMetrics = Array.isArray(allDataResponse?.data)
+            ? allDataResponse.data
+            : Array.isArray(allDataResponse)
+              ? allDataResponse
               : [];
           console.log('📊 Loaded', allDataForMetrics.length, 'payments for metrics calculation');
         } catch (allDataError) {
@@ -1230,21 +1230,21 @@ const Dashboard = () => {
         // Don't overwrite existing stats if they were loaded elsewhere
         console.warn('⚠️ Fund Transfers stats not available for net KPI:', ftStatsError?.message || ftStatsError);
       }
-      
+
       // Load all payments (large limit) and bank info — we filter + paginate client-side
       const [paymentsResponse, bankInfoData] = await Promise.all([
         paymentRegistrationsAPI.getAll(1, 5000, paymentFilters),
         transferConfigAPI.getBankInfo(),
       ]);
 
-      const paymentsArray = Array.isArray(paymentsResponse?.data) 
-        ? paymentsResponse.data 
-        : Array.isArray(paymentsResponse) 
-          ? paymentsResponse 
+      const paymentsArray = Array.isArray(paymentsResponse?.data)
+        ? paymentsResponse.data
+        : Array.isArray(paymentsResponse)
+          ? paymentsResponse
           : [];
-      
+
       console.log('📄 Payments loaded:', paymentsArray.length, 'records (client-side filter + paginate)');
-      
+
       const bankSummaries = bankInfoData?.bankSummaries || [];
       const totals = bankInfoData?.totals || {};
 
@@ -1257,8 +1257,8 @@ const Dashboard = () => {
       // payments + pagination set by filter useEffect
     } catch (err) {
       console.error('Error loading dashboard data:', err);
-        setAllPayments([]);
-        setPayments([]);
+      setAllPayments([]);
+      setPayments([]);
     } finally {
       setTableLoading(false);
       setHasPaymentsInitialLoad(true); // Mark that initial load has happened
@@ -1285,7 +1285,7 @@ const Dashboard = () => {
   // Converts bankCode (014, 004, 002, 025) or various bank names to standard names (SCB, KBANK, BBL, BAY)
   const normalizeBankName = (bankName, bankCode = null) => {
     if (!bankName && !bankCode) return 'Unknown';
-    
+
     // First, try to use bankCode if available
     const bankCodeMap = {
       '014': 'SCB',
@@ -1294,24 +1294,24 @@ const Dashboard = () => {
       '025': 'BAY',
       '006': 'KTB',
     };
-    
+
     if (bankCode && bankCodeMap[bankCode]) {
       return bankCodeMap[bankCode];
     }
-    
+
     // If bankName is already a bankCode, convert it
     if (bankCodeMap[bankName]) {
       return bankCodeMap[bankName];
     }
-    
+
     // Try to match bankName to standard names (case-insensitive)
     const name = (bankName || '').toUpperCase();
-    
+
     // Direct match for standard names
     if (['SCB', 'KBANK', 'BBL', 'BAY', 'KTB'].includes(name)) {
       return name;
     }
-    
+
     // Match common variations
     if (name.includes('SCB') || name.includes('SIAM COMMERCIAL') || name.includes('014')) {
       return 'SCB';
@@ -1328,7 +1328,7 @@ const Dashboard = () => {
     if (name.includes('KTB') || name.includes('KRUNGTHAI') || name.includes('006')) {
       return 'KTB';
     }
-    
+
     // If no match, return original (might be custom bank name)
     return bankName || 'Unknown';
   };
@@ -1341,7 +1341,7 @@ const Dashboard = () => {
       const response = bankRegistrationStats.data || bankRegistrationStats;
       const summary = response.summary || {};
       const banks = response.banks || [];
-      
+
       // Convert banks array to bankStats object for Donut Chart
       // Normalize bank names to standard format (SCB, KBANK, BBL, BAY, etc.)
       const bankStats = {};
@@ -1364,7 +1364,7 @@ const Dashboard = () => {
         bankStats[normalizedBankName].success += bank.success || 0;
       });
       console.log('📈 Final bankStats:', bankStats);
-      
+
       return {
         totalAmount: 0, // Bank registrations don't have amount
         successCount: summary.successCount || 0,
@@ -1375,7 +1375,7 @@ const Dashboard = () => {
         bankStats: bankStats,
       };
     }
-    
+
     // For payments, use stats from API if available
     if (activeTab === 'payments' && paymentStats) {
       const response = paymentStats.data || paymentStats;
@@ -1387,7 +1387,7 @@ const Dashboard = () => {
       // Buy = Payments.totalAmount, Sell = FundTransfers.totalAmount
       const ftSummary = (fundTransferStats?.data || fundTransferStats)?.summary || {};
       const netTotalAmount = (ftSummary.totalAmount || 0) - (summary.totalAmount || 0);
-      
+
       // Convert banks array to bankStats object for Donut Chart
       // Normalize bank names to standard format (SCB, KBANK, BBL, BAY, etc.)
       const bankStats = {};
@@ -1406,7 +1406,7 @@ const Dashboard = () => {
         bankStats[normalizedBankName].amount += bank.totalAmount || 0;
         bankStats[normalizedBankName].success += bank.success || 0;
       });
-      
+
       return {
         totalAmount: netTotalAmount,
         successCount: summary.successCount || 0,
@@ -1417,13 +1417,13 @@ const Dashboard = () => {
         bankStats: bankStats,
       };
     }
-    
+
     // For fund transfers, use stats from API if available
     if (activeTab === 'fund-transfers' && fundTransferStats) {
       const response = fundTransferStats.data || fundTransferStats;
       const summary = response.summary || {};
       const banks = response.banks || [];
-      
+
       // Convert banks array to bankStats object for Donut Chart
       // Normalize bank names to standard format (SCB, KBANK, BBL, BAY, etc.)
       const bankStats = {};
@@ -1442,7 +1442,7 @@ const Dashboard = () => {
         bankStats[normalizedBankName].amount += bank.totalAmount || 0;
         bankStats[normalizedBankName].success += bank.success || 0;
       });
-      
+
       return {
         totalAmount: summary.totalAmount || 0,
         successCount: summary.successCount || 0,
@@ -1453,7 +1453,7 @@ const Dashboard = () => {
         bankStats: bankStats,
       };
     }
-    
+
     // For other tabs (QR Payments), calculate from client-side data
     let dataSource = [];
     switch (activeTab) {
@@ -1535,7 +1535,7 @@ const Dashboard = () => {
 
   // Calculate Net Total Payments (Sell - Buy) regardless of active tab
   // Buy = Payments.totalAmount, Sell = FundTransfers.totalAmount
-const calculateNetTotalPayments = () => {
+  const calculateNetTotalPayments = () => {
     const pSummary = (paymentStats?.data || paymentStats)?.summary || {};
     const ftSummary = (fundTransferStats?.data || fundTransferStats)?.summary || {};
     const buy = pSummary.totalAmount || 0;
@@ -1553,7 +1553,7 @@ const calculateNetTotalPayments = () => {
   // Net = Fund Transfers - Payments (always, regardless of tab)
   const calculateBankDistribution = () => {
     const bankStats = {};
-    
+
     // First, subtract Payments (Buy) - negative values
     if (paymentStats) {
       const pResponse = paymentStats.data || paymentStats;
@@ -1573,7 +1573,7 @@ const calculateNetTotalPayments = () => {
         bankStats[normalizedBankName].success -= bank.success || 0;
       });
     }
-    
+
     // Then, add Fund Transfers (Sell) - positive values
     if (fundTransferStats) {
       const ftResponse = fundTransferStats.data || fundTransferStats;
@@ -1593,12 +1593,12 @@ const calculateNetTotalPayments = () => {
         bankStats[normalizedBankName].success += bank.success || 0;
       });
     }
-    
+
     return bankStats;
   };
 
   const bankDistributionStats = calculateBankDistribution();
-  
+
   // Debug: Log bankDistributionStats to ensure it's being used
   console.log('📊 Bank Distribution Stats (Fund Transfers - Payments):', bankDistributionStats);
   console.log('📊 Payment Stats available:', !!paymentStats);
@@ -1635,7 +1635,7 @@ const calculateNetTotalPayments = () => {
     const status = statusValue?.toLowerCase() || '';
     return status === 'success' || status === 'completed' || status === 'complete';
   };
-  
+
   // Helper function to check if status is pending (so we can separate "failed" cleanly)
   const isPendingStatus = (statusValue) => {
     const status = statusValue?.toLowerCase() || '';
@@ -1688,7 +1688,7 @@ const calculateNetTotalPayments = () => {
     });
   }, [chartDataSource]);
   // NOTE: timeSeriesData no longer used (Transaction Flow uses TradingView-style chart).
-  
+
   // Map สีตาม bank name โดยตรง (ไม่ใช้ index)
   const bankColorMap = {
     'KBANK': '#22c55e',     // เขียว
@@ -1702,12 +1702,12 @@ const calculateNetTotalPayments = () => {
     'TBANK': '#84cc16',     // เขียวมะนาว
     'TISCO': '#06b6d4',     // ฟ้า
   };
-  
+
   // For Bank Registrations tab, use metrics.bankStats (count)
   // For other tabs, use bankDistributionStats (Payments + Fund Transfers, amount)
   const bankStatsForChart = activeTab === 'bank-registrations' ? metrics.bankStats : bankDistributionStats;
   const useCount = activeTab === 'bank-registrations';
-  
+
   // Sort bank names by value (descending) to show largest banks first
   const sortedBankNames = Object.keys(bankStatsForChart || {}).sort((a, b) => {
     const statsA = bankStatsForChart[a];
@@ -1716,7 +1716,7 @@ const calculateNetTotalPayments = () => {
     const valueB = useCount ? (statsB?.count || 0) : (statsB?.amount || 0);
     return valueB - valueA; // Descending order
   });
-  
+
   console.log('=== Bank Distribution Color Mapping (sorted by value) ===');
   console.log('Active Tab:', activeTab);
   console.log('Use Count:', useCount);
@@ -1733,14 +1733,14 @@ const calculateNetTotalPayments = () => {
     const color = bankColorMap[bank] || '#9ca3af';
     console.log(`${bank} = ${value.toFixed(2)} (color: ${color})`);
   });
-  
+
   const mappedData = sortedBankNames.map((bank) => {
     const stats = bankStatsForChart[bank];
     return useCount ? (stats?.count || 0) : (stats?.amount || 0);
   });
-  
+
   const bankColors = sortedBankNames.map(bank => bankColorMap[bank] || '#9ca3af');
-  
+
   const bankDistributionData = {
     labels: sortedBankNames,
     datasets: [
@@ -1783,9 +1783,8 @@ const calculateNetTotalPayments = () => {
   return (
     <div className="p-4 md:p-6 w-full space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* KPI Cards */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
-        activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
-      }`}>
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
+        }`}>
         {/* Net Total Payments - Always shown regardless of tab */}
         <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Net Total = Sell (Fund Transfers) - Buy (Payments)">
           <div className="flex justify-between items-start mb-2">
@@ -1844,7 +1843,7 @@ const calculateNetTotalPayments = () => {
             </div>
           </div>
         )}
-        
+
         {/* New Members Today */}
         <div className="bg-emerald-50 dark:bg-slate-800/50 backdrop-blur-sm border border-emerald-100 dark:border-slate-800 p-4 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-colors shadow-sm" title="New members registered today and total members">
           <div className="flex justify-between items-start mb-2">
@@ -1873,8 +1872,8 @@ const calculateNetTotalPayments = () => {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center gap-3 min-w-0">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm transition-colors">
-                Transaction Flow
-              </h3>
+                  Transaction Flow
+                </h3>
                 {/* Chart date range (does not affect table) */}
                 <div className="flex items-center gap-2">
                   <select
@@ -1971,7 +1970,7 @@ const calculateNetTotalPayments = () => {
                           </div>
                         )}
                       </div>
-            </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -2053,52 +2052,48 @@ const calculateNetTotalPayments = () => {
             <button
               onClick={() => setActiveTab('payments')}
               title="View Payments"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
-                activeTab === 'payments'
+              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'payments'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
                   : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-              }`}
+                }`}
             >
               Payments
             </button>
             <button
               onClick={() => setActiveTab('fund-transfers')}
               title="View Fund Transfers"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
-                activeTab === 'fund-transfers'
+              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'fund-transfers'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
                   : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-              }`}
+                }`}
             >
               Fund Transfers
             </button>
             <button
               onClick={() => setActiveTab('bank-registrations')}
               title="View Bank Registrations"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
-                activeTab === 'bank-registrations'
+              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'bank-registrations'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
                   : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-              }`}
+                }`}
             >
               Bank Registrations
             </button>
             {/* QR Payments tab - แสดงเฉพาะเมื่อมี BILL_PAYMENT */}
             {features.qrPayment && (
-            <button
-              onClick={() => setActiveTab('qr-payments')}
-              title="View QR Payments"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${
-                activeTab === 'qr-payments'
-                  ? 'bg-red-600 text-white scale-105 shadow-sm'
-                  : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-              }`}
-            >
-              QR Payments
-            </button>
+              <button
+                onClick={() => setActiveTab('qr-payments')}
+                title="View QR Payments"
+                className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'qr-payments'
+                    ? 'bg-red-600 text-white scale-105 shadow-sm'
+                    : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
+                  }`}
+              >
+                QR Payments
+              </button>
             )}
           </div>
-          
+
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold text-gray-900 dark:text-white text-sm transition-colors">
               {activeTab === 'qr-payments' ? 'Recent Transactions Qr Payment' : 'Recent Transactions Online Direct Debit'}
@@ -2107,35 +2102,34 @@ const calculateNetTotalPayments = () => {
               <div className="text-[10px] text-gray-500 dark:text-slate-400 transition-colors">
                 Showing {
                   activeTab === 'payments' ? payments.length :
-                  activeTab === 'fund-transfers' ? fundTransfers.length :
-                  activeTab === 'qr-payments' ? qrPayments.length :
-                  bankRegistrations.length
+                    activeTab === 'fund-transfers' ? fundTransfers.length :
+                      activeTab === 'qr-payments' ? qrPayments.length :
+                        bankRegistrations.length
                 } of {
                   activeTab === 'payments' ? pagination.total :
-                  activeTab === 'fund-transfers' ? fundTransferPagination.total :
-                  activeTab === 'qr-payments' ? qrPaymentPagination.total :
-                  bankRegistrationPagination.total
+                    activeTab === 'fund-transfers' ? fundTransferPagination.total :
+                      activeTab === 'qr-payments' ? qrPaymentPagination.total :
+                        bankRegistrationPagination.total
                 } transactions
                 {hasActiveFilters() && ` (filtered)`}
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 title={showFilters ? 'Hide filters' : 'Show filters'}
-                className={`flex items-center gap-1 px-2 py-1 text-xs rounded border transition ${
-                  showFilters || hasActiveFilters()
+                className={`flex items-center gap-1 px-2 py-1 text-xs rounded border transition ${showFilters || hasActiveFilters()
                     ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-500/20 dark:border-blue-500/50 dark:text-blue-400'
                     : 'bg-gray-100 dark:bg-slate-800 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors'
-                }`}
+                  }`}
               >
                 <Filter className="w-3 h-3" />
                 Filters
                 {hasActiveFilters() && (
                   <span className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                    {                    Object.values(
+                    {Object.values(
                       activeTab === 'payments' ? filters :
-                      activeTab === 'fund-transfers' ? fundTransferFilters :
-                      activeTab === 'qr-payments' ? qrPaymentFilters :
-                      bankRegistrationFilters
+                        activeTab === 'fund-transfers' ? fundTransferFilters :
+                          activeTab === 'qr-payments' ? qrPaymentFilters :
+                            bankRegistrationFilters
                     ).filter((v) => v && v !== 'all').length}
                   </span>
                 )}
@@ -2154,15 +2148,15 @@ const calculateNetTotalPayments = () => {
                     type="text"
                     placeholder={
                       activeTab === 'payments' ? "Search (TxID, Ref, Member)..." :
-                      activeTab === 'fund-transfers' ? "Search (Merchant ID, RS Trans ID, Ref)..." :
-                      activeTab === 'qr-payments' ? "Search (Ref1, Ref2, Internal Ref, Service Code)..." :
-                      "Search (Reg Ref, Member Name, Citizen ID)..."
+                        activeTab === 'fund-transfers' ? "Search (Merchant ID, RS Trans ID, Ref)..." :
+                          activeTab === 'qr-payments' ? "Search (Ref1, Ref2, Internal Ref, Service Code)..." :
+                            "Search (Reg Ref, Member Name, Citizen ID)..."
                     }
                     value={
                       activeTab === 'payments' ? filters.search :
-                      activeTab === 'fund-transfers' ? fundTransferFilters.search :
-                      activeTab === 'qr-payments' ? qrPaymentFilters.search :
-                      bankRegistrationFilters.search
+                        activeTab === 'fund-transfers' ? fundTransferFilters.search :
+                          activeTab === 'qr-payments' ? qrPaymentFilters.search :
+                            bankRegistrationFilters.search
                     }
                     onChange={(e) => {
                       if (activeTab === 'payments') {
@@ -2183,9 +2177,9 @@ const calculateNetTotalPayments = () => {
                 <select
                   value={
                     activeTab === 'payments' ? filters.status :
-                    activeTab === 'fund-transfers' ? fundTransferFilters.status :
-                    activeTab === 'qr-payments' ? qrPaymentFilters.status :
-                    bankRegistrationFilters.status
+                      activeTab === 'fund-transfers' ? fundTransferFilters.status :
+                        activeTab === 'qr-payments' ? qrPaymentFilters.status :
+                          bankRegistrationFilters.status
                   }
                   onChange={(e) => {
                     if (activeTab === 'payments') {
@@ -2226,9 +2220,9 @@ const calculateNetTotalPayments = () => {
                 <select
                   value={
                     activeTab === 'payments' ? filters.bank :
-                    activeTab === 'fund-transfers' ? fundTransferFilters.bank :
-                    activeTab === 'qr-payments' ? qrPaymentFilters.bank :
-                    bankRegistrationFilters.bank
+                      activeTab === 'fund-transfers' ? fundTransferFilters.bank :
+                        activeTab === 'qr-payments' ? qrPaymentFilters.bank :
+                          bankRegistrationFilters.bank
                   }
                   onChange={(e) => {
                     if (activeTab === 'payments') {
@@ -2268,9 +2262,9 @@ const calculateNetTotalPayments = () => {
                         <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
                         <span className="pl-6 block truncate">
                           {activeTab === 'payments' ? (filters.dateFrom || 'Start Date') :
-                           activeTab === 'fund-transfers' ? (fundTransferFilters.dateFrom || 'Start Date') :
-                           activeTab === 'qr-payments' ? (qrPaymentFilters.dateFrom || 'Start Date') :
-                           (bankRegistrationFilters.dateFrom || 'Start Date')}
+                            activeTab === 'fund-transfers' ? (fundTransferFilters.dateFrom || 'Start Date') :
+                              activeTab === 'qr-payments' ? (qrPaymentFilters.dateFrom || 'Start Date') :
+                                (bankRegistrationFilters.dateFrom || 'Start Date')}
                         </span>
                       </button>
                       {dateFromPickerOpen && (
@@ -2280,18 +2274,18 @@ const calculateNetTotalPayments = () => {
                             locale={enUS}
                             selected={
                               activeTab === 'payments' ? (filters.dateFrom ? new Date(filters.dateFrom) : undefined) :
-                              activeTab === 'fund-transfers' ? (fundTransferFilters.dateFrom ? new Date(fundTransferFilters.dateFrom) : undefined) :
-                              activeTab === 'qr-payments' ? (qrPaymentFilters.dateFrom ? new Date(qrPaymentFilters.dateFrom) : undefined) :
-                              (bankRegistrationFilters.dateFrom ? new Date(bankRegistrationFilters.dateFrom) : undefined)
+                                activeTab === 'fund-transfers' ? (fundTransferFilters.dateFrom ? new Date(fundTransferFilters.dateFrom) : undefined) :
+                                  activeTab === 'qr-payments' ? (qrPaymentFilters.dateFrom ? new Date(qrPaymentFilters.dateFrom) : undefined) :
+                                    (bankRegistrationFilters.dateFrom ? new Date(bankRegistrationFilters.dateFrom) : undefined)
                             }
-onSelect={(date) => {
-                                const dateFrom = date ? format(date, 'yyyy-MM-dd') : '';
-                                if (activeTab === 'payments') setFilters((prev) => ({ ...prev, dateFrom }));
-                                else if (activeTab === 'fund-transfers') setFundTransferFilters((prev) => ({ ...prev, dateFrom }));
-                                else if (activeTab === 'qr-payments') setQrPaymentFilters((prev) => ({ ...prev, dateFrom }));
-                                else setBankRegistrationFilters((prev) => ({ ...prev, dateFrom }));
-                                setDateFromPickerOpen(false);
-                              }}
+                            onSelect={(date) => {
+                              const dateFrom = date ? format(date, 'yyyy-MM-dd') : '';
+                              if (activeTab === 'payments') setFilters((prev) => ({ ...prev, dateFrom }));
+                              else if (activeTab === 'fund-transfers') setFundTransferFilters((prev) => ({ ...prev, dateFrom }));
+                              else if (activeTab === 'qr-payments') setQrPaymentFilters((prev) => ({ ...prev, dateFrom }));
+                              else setBankRegistrationFilters((prev) => ({ ...prev, dateFrom }));
+                              setDateFromPickerOpen(false);
+                            }}
                             classNames={{
                               selected: 'bg-blue-500 text-white',
                             }}
@@ -2316,9 +2310,9 @@ onSelect={(date) => {
                         <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 dark:text-slate-400" />
                         <span className="pl-6 block truncate">
                           {activeTab === 'payments' ? (filters.dateTo || 'End Date') :
-                           activeTab === 'fund-transfers' ? (fundTransferFilters.dateTo || 'End Date') :
-                           activeTab === 'qr-payments' ? (qrPaymentFilters.dateTo || 'End Date') :
-                           (bankRegistrationFilters.dateTo || 'End Date')}
+                            activeTab === 'fund-transfers' ? (fundTransferFilters.dateTo || 'End Date') :
+                              activeTab === 'qr-payments' ? (qrPaymentFilters.dateTo || 'End Date') :
+                                (bankRegistrationFilters.dateTo || 'End Date')}
                         </span>
                       </button>
                       {dateToPickerOpen && (
@@ -2328,18 +2322,18 @@ onSelect={(date) => {
                             locale={enUS}
                             selected={
                               activeTab === 'payments' ? (filters.dateTo ? new Date(filters.dateTo) : undefined) :
-                              activeTab === 'fund-transfers' ? (fundTransferFilters.dateTo ? new Date(fundTransferFilters.dateTo) : undefined) :
-                              activeTab === 'qr-payments' ? (qrPaymentFilters.dateTo ? new Date(qrPaymentFilters.dateTo) : undefined) :
-                              (bankRegistrationFilters.dateTo ? new Date(bankRegistrationFilters.dateTo) : undefined)
+                                activeTab === 'fund-transfers' ? (fundTransferFilters.dateTo ? new Date(fundTransferFilters.dateTo) : undefined) :
+                                  activeTab === 'qr-payments' ? (qrPaymentFilters.dateTo ? new Date(qrPaymentFilters.dateTo) : undefined) :
+                                    (bankRegistrationFilters.dateTo ? new Date(bankRegistrationFilters.dateTo) : undefined)
                             }
-onSelect={(date) => {
-                                const dateTo = date ? format(date, 'yyyy-MM-dd') : '';
-                                if (activeTab === 'payments') setFilters((prev) => ({ ...prev, dateTo }));
-                                else if (activeTab === 'fund-transfers') setFundTransferFilters((prev) => ({ ...prev, dateTo }));
-                                else if (activeTab === 'qr-payments') setQrPaymentFilters((prev) => ({ ...prev, dateTo }));
-                                else setBankRegistrationFilters((prev) => ({ ...prev, dateTo }));
-                                setDateToPickerOpen(false);
-                              }}
+                            onSelect={(date) => {
+                              const dateTo = date ? format(date, 'yyyy-MM-dd') : '';
+                              if (activeTab === 'payments') setFilters((prev) => ({ ...prev, dateTo }));
+                              else if (activeTab === 'fund-transfers') setFundTransferFilters((prev) => ({ ...prev, dateTo }));
+                              else if (activeTab === 'qr-payments') setQrPaymentFilters((prev) => ({ ...prev, dateTo }));
+                              else setBankRegistrationFilters((prev) => ({ ...prev, dateTo }));
+                              setDateToPickerOpen(false);
+                            }}
                             classNames={{
                               selected: 'bg-blue-500 text-white',
                             }}
@@ -2350,9 +2344,9 @@ onSelect={(date) => {
                   </div>
                 </div>
 
-               
 
-                
+
+
               </div>
 
               {/* Clear Filters Button */}
@@ -2361,9 +2355,9 @@ onSelect={(date) => {
                   <button
                     onClick={
                       activeTab === 'payments' ? clearFilters :
-                      activeTab === 'fund-transfers' ? clearFundTransferFilters :
-                      activeTab === 'qr-payments' ? clearQrPaymentFilters :
-                      clearBankRegistrationFilters
+                        activeTab === 'fund-transfers' ? clearFundTransferFilters :
+                          activeTab === 'qr-payments' ? clearQrPaymentFilters :
+                            clearBankRegistrationFilters
                     }
                     title="Clear all filters"
                     className="flex items-center gap-1 px-3 py-1 bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 rounded text-xs text-red-400 transition"
@@ -2378,439 +2372,439 @@ onSelect={(date) => {
         </div>
         <div className="overflow-x-auto relative">
           <div>
-          {activeTab === 'payments' ? (
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
-                <tr>
-                  <th className="px-5 py-2 font-semibold text-center">No.</th>
-                  <th className="px-5 py-2 font-semibold">Date</th>
-                  <th className="px-5 py-2 font-semibold">Time</th>
-                  <th className="px-5 py-2 font-semibold">Ref</th>
-                  <th className="px-5 py-2 font-semibold">Trans ID</th>
-                  <th className="px-5 py-2 font-semibold">Bank</th>
-                  <th className="px-5 py-2 font-semibold">Member</th>
-                  <th className="px-5 py-2 font-semibold text-right">Amount</th>
-                  <th className="px-5 py-2 font-semibold text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
-                {tableLoading ? (
-                <tr>
-                  <td colSpan="9" className="px-5 py-16 text-center">
-                    <div className="flex justify-center">
-                      <AppLoading size="md" text="Loading Payments..." />
-                    </div>
-                  </td>
-                </tr>
-              ) : payments.length === 0 ? (
-                <tr>
-                  <td colSpan="9" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
-                    No transactions found
-                  </td>
-                </tr>
-              ) : (
-                payments.map((payment, index) => {
-                  const getStatusColor = (status) => {
-                    switch (status?.toLowerCase()) {
-                      case 'success':
-                        return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
-                      case 'failed':
-                      case 'error':
-                        return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
-                      case 'pending':
-                        return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
-                      default:
-                        return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
-                    }
-                  };
-
-                  const formatDate = (dateString) => {
-                    if (!dateString) return { date: '-', time: '-' };
-                    try {
-                      const date = new Date(dateString);
-                      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                      const day = date.getDate();
-                      const month = months[date.getMonth()];
-                      const year = date.getFullYear();
-                      const dateStr = `${day} ${month} ${year}`;
-                      const hours = String(date.getHours()).padStart(2, '0');
-                      const minutes = String(date.getMinutes()).padStart(2, '0');
-                      const seconds = String(date.getSeconds()).padStart(2, '0');
-                      const timeStr = `${hours}:${minutes}:${seconds}`;
-                      return { date: dateStr, time: timeStr };
-                    } catch {
-                      return { date: dateString, time: '' };
-                    }
-                  };
-
-                  const statusStyle = getStatusColor(payment.status);
-                  const rowNumber = ((pagination.page - 1) * pagination.limit) + index + 1;
-                  return (
-                    <tr 
-                      key={payment.id} 
-                      className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
-                      // onClick={() => navigate('/payments')}
-                    >
-                      <td className="px-5 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
-                      <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{formatDate(payment.createdAt).date}</td>
-                      <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{formatDate(payment.createdAt).time}</td>
-                      <td className="px-5 py-3">
-                        <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.ref || payment.ref1 || '-'}</div>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{payment.txnNumber || '-'}</div>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.bankName}</div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{payment.bankCode}</div>
-                      </td>
-                      <td className="px-5 py-3">
-                        <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.member?.name || '-'}</div>
-                        <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{payment.member?.citizenId || ''}</div>
-                      </td>
-                      <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
-                        {formatThaiBaht(payment.amount)}
-                      </td>
-                      <td className="px-5 py-3 text-center">
-                        <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
-                          {payment.status}
-                        </span>
-                        {payment.statusCode && (
-                          <div className="text-[10px] text-slate-500 mt-1">Code: {payment.statusCode}</div>
-                        )}
+            {activeTab === 'payments' ? (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
+                  <tr>
+                    <th className="px-5 py-2 font-semibold text-center">No.</th>
+                    <th className="px-5 py-2 font-semibold">Date</th>
+                    <th className="px-5 py-2 font-semibold">Time</th>
+                    <th className="px-5 py-2 font-semibold">Ref</th>
+                    <th className="px-5 py-2 font-semibold">Trans ID</th>
+                    <th className="px-5 py-2 font-semibold">Bank</th>
+                    <th className="px-5 py-2 font-semibold">Member</th>
+                    <th className="px-5 py-2 font-semibold text-right">Amount</th>
+                    <th className="px-5 py-2 font-semibold text-center">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
+                  {tableLoading ? (
+                    <tr>
+                      <td colSpan="9" className="px-5 py-16 text-center">
+                        <div className="flex justify-center">
+                          <AppLoading size="md" text="Loading Payments..." />
+                        </div>
                       </td>
                     </tr>
-                  );
-                })
-              )}
-              </tbody>
-            </table>
-          ) : activeTab === 'fund-transfers' ? (
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
-                <tr>
-                  <th className="px-5 py-2 font-semibold text-center">No.</th>
-                  <th className="px-5 py-2 font-semibold">Date</th>
-                  <th className="px-5 py-2 font-semibold">Time</th>
-                  <th className="px-5 py-2 font-semibold">Ref</th>
-                  <th className="px-5 py-2 font-semibold">Trans ID</th>
-                  <th className="px-5 py-2 font-semibold">Bank</th>
-                  <th className="px-5 py-2 font-semibold">Member</th>
-                  <th className="px-5 py-2 font-semibold">From / To</th>
-                  <th className="px-5 py-2 font-semibold text-right">Amount</th>
-                  <th className="px-5 py-2 font-semibold text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
-                {tableLoading ? (
+                  ) : payments.length === 0 ? (
+                    <tr>
+                      <td colSpan="9" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
+                        No transactions found
+                      </td>
+                    </tr>
+                  ) : (
+                    payments.map((payment, index) => {
+                      const getStatusColor = (status) => {
+                        switch (status?.toLowerCase()) {
+                          case 'success':
+                            return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+                          case 'failed':
+                          case 'error':
+                            return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+                          case 'pending':
+                            return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
+                          default:
+                            return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+                        }
+                      };
+
+                      const formatDate = (dateString) => {
+                        if (!dateString) return { date: '-', time: '-' };
+                        try {
+                          const date = new Date(dateString);
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const day = date.getDate();
+                          const month = months[date.getMonth()];
+                          const year = date.getFullYear();
+                          const dateStr = `${day} ${month} ${year}`;
+                          const hours = String(date.getHours()).padStart(2, '0');
+                          const minutes = String(date.getMinutes()).padStart(2, '0');
+                          const seconds = String(date.getSeconds()).padStart(2, '0');
+                          const timeStr = `${hours}:${minutes}:${seconds}`;
+                          return { date: dateStr, time: timeStr };
+                        } catch {
+                          return { date: dateString, time: '' };
+                        }
+                      };
+
+                      const statusStyle = getStatusColor(payment.status);
+                      const rowNumber = ((pagination.page - 1) * pagination.limit) + index + 1;
+                      return (
+                        <tr
+                          key={payment.id}
+                          className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
+                        // onClick={() => navigate('/payments')}
+                        >
+                          <td className="px-5 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
+                          <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{formatDate(payment.createdAt).date}</td>
+                          <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{formatDate(payment.createdAt).time}</td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.ref || payment.ref1 || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{payment.txnNumber || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.bankName}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{payment.bankCode}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.member?.name || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{payment.member?.citizenId || ''}</div>
+                          </td>
+                          <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
+                            {formatThaiBaht(payment.amount)}
+                          </td>
+                          <td className="px-5 py-3 text-center">
+                            <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
+                              {payment.status}
+                            </span>
+                            {payment.statusCode && (
+                              <div className="text-[10px] text-slate-500 mt-1">Code: {payment.statusCode}</div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            ) : activeTab === 'fund-transfers' ? (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
                   <tr>
-                    <td colSpan="10" className="px-5 py-16 text-center">
-                      <div className="flex justify-center">
-                        <AppLoading size="md" text="Loading Fund Transfers..." />
-                      </div>
-                    </td>
+                    <th className="px-5 py-2 font-semibold text-center">No.</th>
+                    <th className="px-5 py-2 font-semibold">Date</th>
+                    <th className="px-5 py-2 font-semibold">Time</th>
+                    <th className="px-5 py-2 font-semibold">Ref</th>
+                    <th className="px-5 py-2 font-semibold">Trans ID</th>
+                    <th className="px-5 py-2 font-semibold">Bank</th>
+                    <th className="px-5 py-2 font-semibold">Member</th>
+                    <th className="px-5 py-2 font-semibold">From / To</th>
+                    <th className="px-5 py-2 font-semibold text-right">Amount</th>
+                    <th className="px-5 py-2 font-semibold text-center">Status</th>
                   </tr>
-                ) : fundTransfers.length === 0 ? (
-                  <tr>
-                    <td colSpan="10" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
-                      No fund transfers found
-                    </td>
-                  </tr>
-                ) : (
-                  fundTransfers.map((transfer, index) => {
-                    const getStatusColor = (status) => {
-                      switch (status?.toLowerCase()) {
-                        case 'success':
-                          return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
-                        case 'failed':
-                        case 'error':
-                          return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
-                        case 'pending':
-                          return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
-                        default:
-                          return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
-                      }
-                    };
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
+                  {tableLoading ? (
+                    <tr>
+                      <td colSpan="10" className="px-5 py-16 text-center">
+                        <div className="flex justify-center">
+                          <AppLoading size="md" text="Loading Fund Transfers..." />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : fundTransfers.length === 0 ? (
+                    <tr>
+                      <td colSpan="10" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
+                        No fund transfers found
+                      </td>
+                    </tr>
+                  ) : (
+                    fundTransfers.map((transfer, index) => {
+                      const getStatusColor = (status) => {
+                        switch (status?.toLowerCase()) {
+                          case 'success':
+                            return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+                          case 'failed':
+                          case 'error':
+                            return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+                          case 'pending':
+                            return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
+                          default:
+                            return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+                        }
+                      };
 
-                    const formatDate = (dateString) => {
-                      if (!dateString) return { date: '-', time: '-' };
-                      try {
-                        const date = new Date(dateString);
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        const day = date.getDate();
-                        const month = months[date.getMonth()];
-                        const year = date.getFullYear();
-                        const dateStr = `${day} ${month} ${year}`;
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const seconds = String(date.getSeconds()).padStart(2, '0');
-                        const timeStr = `${hours}:${minutes}:${seconds}`;
-                        return { date: dateStr, time: timeStr };
-                      } catch {
-                        return { date: dateString, time: '' };
-                      }
-                    };
+                      const formatDate = (dateString) => {
+                        if (!dateString) return { date: '-', time: '-' };
+                        try {
+                          const date = new Date(dateString);
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const day = date.getDate();
+                          const month = months[date.getMonth()];
+                          const year = date.getFullYear();
+                          const dateStr = `${day} ${month} ${year}`;
+                          const hours = String(date.getHours()).padStart(2, '0');
+                          const minutes = String(date.getMinutes()).padStart(2, '0');
+                          const seconds = String(date.getSeconds()).padStart(2, '0');
+                          const timeStr = `${hours}:${minutes}:${seconds}`;
+                          return { date: dateStr, time: timeStr };
+                        } catch {
+                          return { date: dateString, time: '' };
+                        }
+                      };
 
-                    const status = transfer.transferStatus || transfer.inquiryStatus || 'UNKNOWN';
-                    const statusStyle = getStatusColor(status);
-                    const rowNumber = ((fundTransferPagination.page - 1) * fundTransferPagination.limit) + index + 1;
-                    const dateTime = transfer.createdAt || transfer.requestDateTime;
+                      const status = transfer.transferStatus || transfer.inquiryStatus || 'UNKNOWN';
+                      const statusStyle = getStatusColor(status);
+                      const rowNumber = ((fundTransferPagination.page - 1) * fundTransferPagination.limit) + index + 1;
+                      const dateTime = transfer.createdAt || transfer.requestDateTime;
 
-                    return (
-                      <tr
-                        key={transfer.id}
-                        className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
+                      return (
+                        <tr
+                          key={transfer.id}
+                          className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
                         // onClick={() => navigate('/fund-transfers')}
-                      >
-                        <td className="px-5 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
-                        <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{formatDate(dateTime).date}</td>
-                        <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{formatDate(dateTime).time}</td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.ref1 || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{transfer.rsTransID || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.serviceBankName || '-'}</div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{transfer.serviceBankCode || ''}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.member?.name || '-'}</div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{transfer.member?.citizenId || ''}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.fromAccountNo || '-'}</div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">→ {transfer.toAccountNo || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
-                          {formatThaiBaht(transfer.amount)}
-                        </td>
-                        <td className="px-5 py-3 text-center">
-                          <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
-                            {status}
-                          </span>
-                          {transfer.responseCode && (
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 transition-colors">Code: {transfer.responseCode}</div>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          ) : activeTab === 'bank-registrations' ? (
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
-                <tr>
-                  <th className="px-2 py-2 font-semibold text-center w-16">No.</th>
-                  <th className="px-5 py-2 font-semibold">Reg Ref</th>
-                  <th className="px-5 py-2 font-semibold">Bank</th>
-                  <th className="px-5 py-2 font-semibold">Member</th>
-                  <th className="px-5 py-2 font-semibold">Date</th>
-                  <th className="px-5 py-2 font-semibold">Time</th>
-                  <th className="px-5 py-2 font-semibold text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
-                {tableLoading ? (
+                        >
+                          <td className="px-5 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
+                          <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{formatDate(dateTime).date}</td>
+                          <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{formatDate(dateTime).time}</td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.ref1 || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{transfer.rsTransID || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.serviceBankName || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{transfer.serviceBankCode || ''}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.member?.name || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{transfer.member?.citizenId || ''}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.fromAccountNo || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">→ {transfer.toAccountNo || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
+                            {formatThaiBaht(transfer.amount)}
+                          </td>
+                          <td className="px-5 py-3 text-center">
+                            <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
+                              {status}
+                            </span>
+                            {transfer.responseCode && (
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 transition-colors">Code: {transfer.responseCode}</div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            ) : activeTab === 'bank-registrations' ? (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
                   <tr>
-                    <td colSpan="7" className="px-5 py-16 text-center">
-                      <div className="flex justify-center">
-                        <AppLoading size="md" text="Loading Bank Registrations..." />
-                      </div>
-                    </td>
+                    <th className="px-2 py-2 font-semibold text-center w-16">No.</th>
+                    <th className="px-5 py-2 font-semibold">Reg Ref</th>
+                    <th className="px-5 py-2 font-semibold">Bank</th>
+                    <th className="px-5 py-2 font-semibold">Member</th>
+                    <th className="px-5 py-2 font-semibold">Date</th>
+                    <th className="px-5 py-2 font-semibold">Time</th>
+                    <th className="px-5 py-2 font-semibold text-center">Status</th>
                   </tr>
-                ) : bankRegistrations.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
-                      No registrations found
-                    </td>
-                  </tr>
-                ) : (
-                  bankRegistrations.map((registration, index) => {
-                    const getStatusColor = (status) => {
-                      switch (status?.toUpperCase()) {
-                        case 'SUCCESS':
-                          return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
-                        case 'FAILED':
-                          return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
-                        case 'PENDING':
-                          return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
-                        default:
-                          return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
-                      }
-                    };
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
+                  {tableLoading ? (
+                    <tr>
+                      <td colSpan="7" className="px-5 py-16 text-center">
+                        <div className="flex justify-center">
+                          <AppLoading size="md" text="Loading Bank Registrations..." />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : bankRegistrations.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
+                        No registrations found
+                      </td>
+                    </tr>
+                  ) : (
+                    bankRegistrations.map((registration, index) => {
+                      const getStatusColor = (status) => {
+                        switch (status?.toUpperCase()) {
+                          case 'SUCCESS':
+                            return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+                          case 'FAILED':
+                            return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+                          case 'PENDING':
+                            return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
+                          default:
+                            return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+                        }
+                      };
 
-                    const formatDate = (dateString) => {
-                      if (!dateString) return { date: '-', time: '-' };
-                      try {
-                        const date = new Date(dateString);
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        const day = date.getDate();
-                        const month = months[date.getMonth()];
-                        const year = date.getFullYear();
-                        const dateStr = `${day} ${month} ${year}`;
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const seconds = String(date.getSeconds()).padStart(2, '0');
-                        const timeStr = `${hours}:${minutes}:${seconds}`;
-                        return { date: dateStr, time: timeStr };
-                      } catch {
-                        return { date: dateString, time: '' };
-                      }
-                    };
+                      const formatDate = (dateString) => {
+                        if (!dateString) return { date: '-', time: '-' };
+                        try {
+                          const date = new Date(dateString);
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const day = date.getDate();
+                          const month = months[date.getMonth()];
+                          const year = date.getFullYear();
+                          const dateStr = `${day} ${month} ${year}`;
+                          const hours = String(date.getHours()).padStart(2, '0');
+                          const minutes = String(date.getMinutes()).padStart(2, '0');
+                          const seconds = String(date.getSeconds()).padStart(2, '0');
+                          const timeStr = `${hours}:${minutes}:${seconds}`;
+                          return { date: dateStr, time: timeStr };
+                        } catch {
+                          return { date: dateString, time: '' };
+                        }
+                      };
 
-                    const statusStyle = getStatusColor(registration.status);
-                    const rowNumber = ((bankRegistrationPagination.page - 1) * bankRegistrationPagination.limit) + index + 1;
-                    const dateTime = formatDate(registration.createdAt);
+                      const statusStyle = getStatusColor(registration.status);
+                      const rowNumber = ((bankRegistrationPagination.page - 1) * bankRegistrationPagination.limit) + index + 1;
+                      const dateTime = formatDate(registration.createdAt);
 
-                    return (
-                      <tr 
-                        key={registration.id} 
-                        className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
+                      return (
+                        <tr
+                          key={registration.id}
+                          className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors"
                         // onClick={() => navigate('/bank-registrations')}
-                      >
-                        <td className="px-2 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{registration.regRef || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{registration.bankName || '-'}</div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{registration.bankCode || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{registration.member?.name || '-'}</div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono transition-colors">{registration.member?.citizenId || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{dateTime.date}</td>
-                        <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{dateTime.time}</td>
-                        <td className="px-5 py-3 text-center">
-                          <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
-                            {registration.status || '-'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          ) : (
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
-                <tr>
-                  <th className="px-5 py-2 font-semibold text-center">No.</th>
-                  <th className="px-5 py-2 font-semibold">Date</th>
-                  <th className="px-5 py-2 font-semibold">Time</th>
-                  <th className="px-5 py-2 font-semibold">Ref1</th>
-                  <th className="px-5 py-2 font-semibold">Ref2</th>
-                  <th className="px-5 py-2 font-semibold">Internal Ref</th>
-                  <th className="px-5 py-2 font-semibold">Service Code</th>
-                  <th className="px-5 py-2 font-semibold">Bank Code</th>
-                  <th className="px-5 py-2 font-semibold">Tax ID</th>
-                  <th className="px-5 py-2 font-semibold text-right">Amount</th>
-                  <th className="px-5 py-2 font-semibold text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
-                {tableLoading ? (
+                        >
+                          <td className="px-2 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{registration.regRef || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{registration.bankName || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{registration.bankCode || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{registration.member?.name || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono transition-colors">{registration.member?.citizenId || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{dateTime.date}</td>
+                          <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{dateTime.time}</td>
+                          <td className="px-5 py-3 text-center">
+                            <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
+                              {registration.status || '-'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-100 dark:bg-slate-900/50 text-slate-700 dark:text-slate-500 transition-colors">
                   <tr>
-                    <td colSpan="11" className="px-5 py-16 text-center">
-                      <div className="flex justify-center">
-                        <AppLoading size="md" text="Loading QR Payments..." />
-                      </div>
-                    </td>
+                    <th className="px-5 py-2 font-semibold text-center">No.</th>
+                    <th className="px-5 py-2 font-semibold">Date</th>
+                    <th className="px-5 py-2 font-semibold">Time</th>
+                    <th className="px-5 py-2 font-semibold">Ref1</th>
+                    <th className="px-5 py-2 font-semibold">Ref2</th>
+                    <th className="px-5 py-2 font-semibold">Internal Ref</th>
+                    <th className="px-5 py-2 font-semibold">Service Code</th>
+                    <th className="px-5 py-2 font-semibold">Bank Code</th>
+                    <th className="px-5 py-2 font-semibold">Tax ID</th>
+                    <th className="px-5 py-2 font-semibold text-right">Amount</th>
+                    <th className="px-5 py-2 font-semibold text-center">Status</th>
                   </tr>
-                ) : qrPayments.length === 0 ? (
-                  <tr>
-                    <td colSpan="11" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
-                      No QR payments found
-                    </td>
-                  </tr>
-                ) : (
-                  qrPayments.map((qrPayment, index) => {
-                    const getStatusColor = (status) => {
-                      switch (status?.toUpperCase()) {
-                        case 'GENERATED':
-                          return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
-                        case 'USED':
-                          return { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' };
-                        default:
-                          return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
-                      }
-                    };
+                </thead>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-700/50 text-slate-700 dark:text-slate-400 font-mono transition-colors">
+                  {tableLoading ? (
+                    <tr>
+                      <td colSpan="11" className="px-5 py-16 text-center">
+                        <div className="flex justify-center">
+                          <AppLoading size="md" text="Loading QR Payments..." />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : qrPayments.length === 0 ? (
+                    <tr>
+                      <td colSpan="11" className="px-5 py-4 text-center text-slate-600 dark:text-slate-500 transition-colors">
+                        No QR payments found
+                      </td>
+                    </tr>
+                  ) : (
+                    qrPayments.map((qrPayment, index) => {
+                      const getStatusColor = (status) => {
+                        switch (status?.toUpperCase()) {
+                          case 'GENERATED':
+                            return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+                          case 'USED':
+                            return { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' };
+                          default:
+                            return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+                        }
+                      };
 
-                    const formatDate = (dateString) => {
-                      if (!dateString) return { date: '-', time: '-' };
-                      try {
-                        const date = new Date(dateString);
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                        const day = date.getDate();
-                        const month = months[date.getMonth()];
-                        const year = date.getFullYear();
-                        const dateStr = `${day} ${month} ${year}`;
-                        const hours = String(date.getHours()).padStart(2, '0');
-                        const minutes = String(date.getMinutes()).padStart(2, '0');
-                        const seconds = String(date.getSeconds()).padStart(2, '0');
-                        const timeStr = `${hours}:${minutes}:${seconds}`;
-                        return { date: dateStr, time: timeStr };
-                      } catch {
-                        return { date: dateString, time: '' };
-                      }
-                    };
+                      const formatDate = (dateString) => {
+                        if (!dateString) return { date: '-', time: '-' };
+                        try {
+                          const date = new Date(dateString);
+                          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                          const day = date.getDate();
+                          const month = months[date.getMonth()];
+                          const year = date.getFullYear();
+                          const dateStr = `${day} ${month} ${year}`;
+                          const hours = String(date.getHours()).padStart(2, '0');
+                          const minutes = String(date.getMinutes()).padStart(2, '0');
+                          const seconds = String(date.getSeconds()).padStart(2, '0');
+                          const timeStr = `${hours}:${minutes}:${seconds}`;
+                          return { date: dateStr, time: timeStr };
+                        } catch {
+                          return { date: dateString, time: '' };
+                        }
+                      };
 
-                    const statusStyle = getStatusColor(qrPayment.status);
-                    const rowNumber = ((qrPaymentPagination.page - 1) * qrPaymentPagination.limit) + index + 1;
-                    const dateTime = formatDate(qrPayment.createdAt);
+                      const statusStyle = getStatusColor(qrPayment.status);
+                      const rowNumber = ((qrPaymentPagination.page - 1) * qrPaymentPagination.limit) + index + 1;
+                      const dateTime = formatDate(qrPayment.createdAt);
 
-                    return (
-                      <tr 
-                        key={qrPayment.id} 
-                        className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
-                        onClick={() => setSelectedQrPaymentId(qrPayment.id)}
-                      >
-                        <td className="px-5 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
-                        <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{dateTime.date}</td>
-                        <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{dateTime.time}</td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.ref1 || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.ref2 || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.internalRef || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 transition-colors">{qrPayment.serviceCode || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.bankCode || '-'}</div>
-                          <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">Suffix: {qrPayment.suffix || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3">
-                          <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.taxId || '-'}</div>
-                        </td>
-                        <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
-                          {formatThaiBaht(qrPayment.amountInBaht)}
-                        </td>
-                        <td className="px-5 py-3 text-center">
-                          <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
-                            {qrPayment.status || '-'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          )}
+                      return (
+                        <tr
+                          key={qrPayment.id}
+                          className="hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                          onClick={() => setSelectedQrPaymentId(qrPayment.id)}
+                        >
+                          <td className="px-5 py-3 text-center text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{rowNumber}</td>
+                          <td className="px-5 py-3 text-slate-800 dark:text-slate-300 transition-colors">{dateTime.date}</td>
+                          <td className="px-5 py-3 text-slate-600 dark:text-slate-400 font-mono text-xs transition-colors">{dateTime.time}</td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.ref1 || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.ref2 || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.internalRef || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{qrPayment.serviceCode || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.bankCode || '-'}</div>
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">Suffix: {qrPayment.suffix || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <div className="text-slate-800 dark:text-slate-300 font-mono text-xs transition-colors">{qrPayment.taxId || '-'}</div>
+                          </td>
+                          <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
+                            {formatThaiBaht(qrPayment.amountInBaht)}
+                          </td>
+                          <td className="px-5 py-3 text-center">
+                            <span className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} px-2 py-0.5 rounded text-[10px] font-bold border`}>
+                              {qrPayment.status || '-'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
-        
+
         {/* Pagination */}
         {activeTab === 'payments' && pagination.total > 0 && (
           <div className="px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex justify-between items-center transition-colors">
@@ -2917,7 +2911,7 @@ onSelect={(date) => {
           </div>
         )}
       </div>
-      
+
       {/* QR Payment Detail Modal */}
       <QrPaymentDetailModal
         isOpen={!!selectedQrPaymentId}
@@ -2959,86 +2953,86 @@ onSelect={(date) => {
                       <option value="custom">Custom</option>
                     </select>
                     {transactionFlowRange.preset === 'custom' && (
-  <div className="flex items-center gap-2" ref={transactionFlowDatePickerRef}>
-  {/* From Date */}
-  <div className="relative">
-    <button
-      type="button"
-      onClick={() => {
-        setTransactionFlowFromPickerOpen(!transactionFlowFromPickerOpen);
-        setTransactionFlowToPickerOpen(false);
-      }}
-      className="text-xs rounded-md border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 text-gray-700 dark:text-slate-200 px-2 py-1 flex items-center gap-1 min-w-[100px]"
-    >
-      <Calendar className="w-3 h-3 text-gray-400" />
-      <span className="truncate">
-        {transactionFlowRange.from || 'Start'}
-      </span>
-    </button>
-    {transactionFlowFromPickerOpen && (
-      <div className="absolute z-50 mt-1 left-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg p-3">
-        <DayPicker
-          mode="single"
-          locale={enUS}
-          selected={transactionFlowRange.from ? new Date(transactionFlowRange.from) : undefined}
-          onSelect={(date) => {
-            const from = date ? format(date, 'yyyy-MM-dd') : '';
-            setTransactionFlowRange((prev) => ({ ...prev, from }));
-            setTransactionFlowFromPickerOpen(false);
-          }}
-          disabled={(date) => {
-            const to = parseLocalDate(transactionFlowRange.to);
-            if (to) return date > to;
-            return false;
-          }}
-          classNames={{
-            selected: 'bg-blue-500 text-white',
-          }}
-        />
-      </div>
-    )}
-  </div>
-  <span className="text-xs text-gray-400">-</span>
-  {/* To Date */}
-  <div className="relative">
-    <button
-      type="button"
-      onClick={() => {
-        setTransactionFlowToPickerOpen(!transactionFlowToPickerOpen);
-        setTransactionFlowFromPickerOpen(false);
-      }}
-      className="text-xs rounded-md border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 text-gray-700 dark:text-slate-200 px-2 py-1 flex items-center gap-1 min-w-[100px]"
-    >
-      <Calendar className="w-3 h-3 text-gray-400" />
-      <span className="truncate">
-        {transactionFlowRange.to || 'End'}
-      </span>
-    </button>
-    {transactionFlowToPickerOpen && (
-      <div className="absolute z-50 mt-1 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg p-3">
-        <DayPicker
-          mode="single"
-          locale={enUS}
-          selected={transactionFlowRange.to ? new Date(transactionFlowRange.to) : undefined}
-          onSelect={(date) => {
-            const to = date ? format(date, 'yyyy-MM-dd') : '';
-            setTransactionFlowRange((prev) => ({ ...prev, to }));
-            setTransactionFlowToPickerOpen(false);
-          }}
-          disabled={(date) => {
-            const from = parseLocalDate(transactionFlowRange.from);
-            if (from) return date < from;
-            return false;
-          }}
-          classNames={{
-            selected: 'bg-blue-500 text-white',
-          }}
-        />
-      </div>
-    )}
-  </div>
-</div>
-)}
+                      <div className="flex items-center gap-2" ref={transactionFlowDatePickerRef}>
+                        {/* From Date */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTransactionFlowFromPickerOpen(!transactionFlowFromPickerOpen);
+                              setTransactionFlowToPickerOpen(false);
+                            }}
+                            className="text-xs rounded-md border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 text-gray-700 dark:text-slate-200 px-2 py-1 flex items-center gap-1 min-w-[100px]"
+                          >
+                            <Calendar className="w-3 h-3 text-gray-400" />
+                            <span className="truncate">
+                              {transactionFlowRange.from || 'Start'}
+                            </span>
+                          </button>
+                          {transactionFlowFromPickerOpen && (
+                            <div className="absolute z-50 mt-1 left-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg p-3">
+                              <DayPicker
+                                mode="single"
+                                locale={enUS}
+                                selected={transactionFlowRange.from ? new Date(transactionFlowRange.from) : undefined}
+                                onSelect={(date) => {
+                                  const from = date ? format(date, 'yyyy-MM-dd') : '';
+                                  setTransactionFlowRange((prev) => ({ ...prev, from }));
+                                  setTransactionFlowFromPickerOpen(false);
+                                }}
+                                disabled={(date) => {
+                                  const to = parseLocalDate(transactionFlowRange.to);
+                                  if (to) return date > to;
+                                  return false;
+                                }}
+                                classNames={{
+                                  selected: 'bg-blue-500 text-white',
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400">-</span>
+                        {/* To Date */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTransactionFlowToPickerOpen(!transactionFlowToPickerOpen);
+                              setTransactionFlowFromPickerOpen(false);
+                            }}
+                            className="text-xs rounded-md border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 text-gray-700 dark:text-slate-200 px-2 py-1 flex items-center gap-1 min-w-[100px]"
+                          >
+                            <Calendar className="w-3 h-3 text-gray-400" />
+                            <span className="truncate">
+                              {transactionFlowRange.to || 'End'}
+                            </span>
+                          </button>
+                          {transactionFlowToPickerOpen && (
+                            <div className="absolute z-50 mt-1 right-0 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg shadow-lg p-3">
+                              <DayPicker
+                                mode="single"
+                                locale={enUS}
+                                selected={transactionFlowRange.to ? new Date(transactionFlowRange.to) : undefined}
+                                onSelect={(date) => {
+                                  const to = date ? format(date, 'yyyy-MM-dd') : '';
+                                  setTransactionFlowRange((prev) => ({ ...prev, to }));
+                                  setTransactionFlowToPickerOpen(false);
+                                }}
+                                disabled={(date) => {
+                                  const from = parseLocalDate(transactionFlowRange.from);
+                                  if (from) return date < from;
+                                  return false;
+                                }}
+                                classNames={{
+                                  selected: 'bg-blue-500 text-white',
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

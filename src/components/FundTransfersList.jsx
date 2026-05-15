@@ -37,6 +37,7 @@ const FundTransfersList = () => {
     search: '',
     status: 'all',
     bank: 'all',
+    currency: 'all', // 'all' | 'usd' | 'thb'
     dateFrom: '',
     dateTo: '',
     amountMin: '',
@@ -82,7 +83,7 @@ const FundTransfersList = () => {
   useEffect(() => {
     setPagination(prev => ({ ...prev, page: 1 }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.bank, filters.status, filters.search, filters.dateFrom, filters.dateTo, filters.amountMin, filters.amountMax]);
+  }, [filters.bank, filters.status, filters.currency, filters.search, filters.dateFrom, filters.dateTo, filters.amountMin, filters.amountMax]);
 
   useEffect(() => {
     if (!Array.isArray(allTransfers)) return;
@@ -101,6 +102,11 @@ const FundTransfersList = () => {
       }
       if (f.bank !== 'all') {
         if ((t.serviceBankCode || '') !== f.bank) return false;
+      }
+      if (f.currency !== 'all') {
+        const isUSD = (t.fromAccountNo || '').endsWith('840') || (t.toAccountNo || '').endsWith('840');
+        if (f.currency === 'usd' && !isUSD) return false;
+        if (f.currency === 'thb' && isUSD) return false;
       }
       const d = new Date(t.createdAt || t.requestDateTime);
       if (f.dateFrom) {
@@ -127,7 +133,7 @@ const FundTransfersList = () => {
     setTransfers(sorted.slice(start, start + limit));
     setPagination(prev => ({ ...prev, total, totalPages, page: safePage }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allTransfers, filters.bank, filters.status, filters.search, filters.dateFrom, filters.dateTo, filters.amountMin, filters.amountMax, pagination.page, pagination.limit]);
+  }, [allTransfers, filters.bank, filters.status, filters.currency, filters.search, filters.dateFrom, filters.dateTo, filters.amountMin, filters.amountMax, pagination.page, pagination.limit]);
 
   // Load bank list
   const loadBankList = async () => {
@@ -185,7 +191,24 @@ const FundTransfersList = () => {
       });
       return `฿${formatted}`;
     } catch {
-      return `฿${amount}`;
+      return '฿0.00';
+    }
+  };
+
+  // Format currency based on account number (840 = USD, others = THB)
+  const formatCurrency = (amount, fromAccountNo, toAccountNo) => {
+    if (!amount) return '฿0.00';
+    try {
+      const formatted = parseFloat(amount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      // Check if either account ends with 840
+      const isUSD = (fromAccountNo && String(fromAccountNo).endsWith('840')) || 
+                    (toAccountNo && String(toAccountNo).endsWith('840'));
+      return isUSD ? `$${formatted}` : `฿${formatted}`;
+    } catch {
+      return '฿0.00';
     }
   };
 
@@ -204,7 +227,7 @@ const FundTransfersList = () => {
   };
 
   const clearFilters = () => {
-    setFilters({ search: '', status: 'all', bank: 'all', dateFrom: '', dateTo: '', amountMin: '', amountMax: '' });
+    setFilters({ search: '', status: 'all', bank: 'all', currency: 'all', dateFrom: '', dateTo: '', amountMin: '', amountMax: '' });
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
@@ -213,6 +236,7 @@ const FundTransfersList = () => {
       filters.search ||
       filters.status !== 'all' ||
       filters.bank !== 'all' ||
+      filters.currency !== 'all' ||
       filters.dateFrom ||
       filters.dateTo ||
       filters.amountMin ||
@@ -310,6 +334,20 @@ const FundTransfersList = () => {
                       {bank.bankNameThai || bank.bankNameEng || bank.bankName} ({bank.bankCode})
                     </option>
                   ))}
+                </select>
+              </div>
+
+              {/* Currency Filter */}
+              <div>
+                <label className="block text-xs text-gray-600 dark:text-slate-400 mb-2 transition-colors">Currency</label>
+                <select
+                  value={filters.currency}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, currency: e.target.value }))}
+                  className="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-colors"
+                >
+                  <option value="all">All Currencies</option>
+                  <option value="usd">USD ($)</option>
+                  <option value="thb">THB (฿)</option>
                 </select>
               </div>
 
@@ -464,7 +502,7 @@ const FundTransfersList = () => {
                             <div className="text-xs text-gray-500 dark:text-slate-500 transition-colors">→ {transfer.toAccountNo || '-'}</div>
                           </td>
                           <td className="px-4 py-3 text-sm text-right">
-                            <div className="text-gray-900 dark:text-white font-bold font-mono transition-colors">{formatThaiBaht(transfer.amount)}</div>
+                            <div className="text-gray-900 dark:text-white font-bold font-mono transition-colors">{formatCurrency(transfer.amount, transfer.fromAccountNo, transfer.toAccountNo)}</div>
                           </td>
                           <td className="px-4 py-3 text-sm">
                             {(() => {

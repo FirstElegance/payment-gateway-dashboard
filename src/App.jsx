@@ -18,6 +18,7 @@ import QrPaymentsList from './components/QrPaymentsList';
 import MembersList from './components/MembersList';
 import PaymentRegistrationsDashboard from './components/PaymentRegistrationsDashboard';
 import TreasuryMonitor from './components/TreasuryMonitor';
+import WalletTransactions from './components/WalletTransactions';
 import './App.css';
 
 function App() {
@@ -68,6 +69,9 @@ function App() {
                     
                     {/* Treasury Monitor */}
                     <Route path="/treasury" element={<TreasuryMonitor />} />
+                    
+                    {/* Wallet Transactions */}
+                    <Route path="/wallet" element={<WalletTransactions />} />
                     
                     {/* Catch all - redirect to dashboard */}
                     <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Settings, Home, LogOut, User, FileText, Wallet, ArrowLeftRight, Sun, Moon, QrCode, Users, Menu, X, RefreshCw, ChevronDown } from 'lucide-react';
+import { Settings, Home, LogOut, User, FileText, Wallet, ArrowLeftRight, Sun, Moon, QrCode, Users, Menu, X, RefreshCw, ChevronDown, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFeatures } from '../contexts/FeatureContext';
@@ -23,6 +23,7 @@ const Layout = ({ children }) => {
   const [businessConfig, setBusinessConfig] = useState(null);
   const [activeBanks, setActiveBanks] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [allConfigs, setAllConfigs] = useState([]);
   
   // Load profile name and business config
   useEffect(() => {
@@ -60,9 +61,20 @@ const Layout = ({ children }) => {
       }
     };
     
+    const loadAllConfigs = async () => {
+      try {
+        const response = await bankConfigAPI.getAll();
+        setAllConfigs(Array.isArray(response) ? response : []);
+      } catch (err) {
+        console.error('Error loading configs:', err);
+        setAllConfigs([]);
+      }
+    };
+    
     loadProfileName();
     loadBusinessConfig();
     loadActiveBanks();
+    loadAllConfigs();
   }, []);
 
   const getBankIconPath = (bankCode) => {
@@ -106,19 +118,35 @@ const Layout = ({ children }) => {
   // Nav items - filter based on features
   const allNavItems = [
     { path: '/', label: 'Dashboard', icon: Home },
-    { path: '/payments', label: 'Payments', icon: Wallet },
+    { path: '/payments', label: 'Payments', icon: CreditCard },
     { path: '/fund-transfers', label: 'Fund Transfers', icon: ArrowLeftRight },
     { path: '/bank-registrations', label: 'Bank Registrations', icon: FileText },
     { path: '/qr-payments', label: 'QR Payments', icon: QrCode, requireFeature: 'qrPayment' }, // ต้องมี BILL_PAYMENT
+    { path: '/wallet', label: 'Wallet', icon: Wallet, requireConfig: { bankCode: 'wallet', serviceCode: 'WALLET' } },
     { path: '/members', label: 'Members', icon: Users },
     { path: '/bank-configs', label: 'Bank Configurations', icon: Settings },
   ];
 
-  // Filter nav items based on features
+  // Filter nav items based on features and configs
   const navItems = allNavItems.filter(item => {
+    // Check feature requirement
     if (item.requireFeature) {
-      return features[item.requireFeature] === true;
+      if (features[item.requireFeature] !== true) {
+        return false;
+      }
     }
+    
+    // Check config requirement (for wallet)
+    if (item.requireConfig) {
+      const { bankCode, serviceCode } = item.requireConfig;
+      const hasConfig = allConfigs.some(
+        c => c.bankCode === bankCode && c.serviceCode === serviceCode
+      );
+      if (!hasConfig) {
+        return false;
+      }
+    }
+    
     return true;
   });
 

@@ -84,6 +84,22 @@ const PaymentDetailModal = ({
     }
   };
 
+  const getFirstDefined = (obj, paths) => {
+    for (const path of paths) {
+      const parts = String(path).split('.');
+      let cur = obj;
+      for (const key of parts) {
+        if (cur == null) {
+          cur = undefined;
+          break;
+        }
+        cur = cur?.[key];
+      }
+      if (cur !== undefined && cur !== null && String(cur).trim() !== '') return cur;
+    }
+    return undefined;
+  };
+
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'success':
@@ -129,6 +145,28 @@ const PaymentDetailModal = ({
   if (!isOpen) return null;
 
   const statusStyle = payment ? getStatusColor(payment.status) : null;
+  const fromAccount = payment
+    ? getFirstDefined(payment, [
+        'fromAccount',
+        'fromAccountNo',
+        'fromAccountNumber',
+        'requestBody.fromAccount',
+        'requestBody.fromAccountNo',
+        'payload.fromAccount',
+        'data.fromAccount',
+      ])
+    : undefined;
+  const toAccount = payment
+    ? getFirstDefined(payment, [
+        'toAccount',
+        'toAccountNo',
+        'toAccountNumber',
+        'requestBody.toAccount',
+        'requestBody.toAccountNo',
+        'payload.toAccount',
+        'data.toAccount',
+      ])
+    : undefined;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -228,6 +266,23 @@ const PaymentDetailModal = ({
                   </div>
                 </div>
 
+                {/* Account Info */}
+                {(fromAccount !== undefined || toAccount !== undefined) && (
+                  <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
+                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 transition-colors">Account Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <div className="text-gray-600 dark:text-slate-400 mb-1 transition-colors">From Account</div>
+                        <div className="text-gray-900 dark:text-white font-mono transition-colors break-all">{fromAccount ?? '-'}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-600 dark:text-slate-400 mb-1 transition-colors">To Account</div>
+                        <div className="text-gray-900 dark:text-white font-mono transition-colors break-all">{toAccount ?? '-'}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Member Info */}
                 {payment.member && (
                   <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
@@ -254,7 +309,7 @@ const PaymentDetailModal = ({
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 transition-colors">Additional Information</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     <div>
-                      <div className="text-gray-600 dark:text-slate-400 mb-1 transition-colors">Error Message</div>
+                      <div className="text-gray-600 dark:text-slate-400 mb-1 transition-colors">Message</div>
                       <div className="text-gray-900 dark:text-white transition-colors">{payment.errorMessage || '-'}</div>
                     </div>
                     <div>

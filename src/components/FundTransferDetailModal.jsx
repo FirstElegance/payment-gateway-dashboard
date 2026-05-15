@@ -79,6 +79,24 @@ const FundTransferDetailModal = ({
     return `฿${numAmount.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  // Format currency based on account number (840 = USD, others = THB)
+  const formatCurrency = (amount, fromAccountNo, toAccountNo) => {
+    if (!amount) return '฿0.00';
+    try {
+      const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+      const formatted = numAmount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      // Check if either account ends with 840
+      const isUSD = (fromAccountNo && String(fromAccountNo).endsWith('840')) || 
+                    (toAccountNo && String(toAccountNo).endsWith('840'));
+      return isUSD ? `$${formatted}` : `฿${formatted}`;
+    } catch {
+      return '฿0.00';
+    }
+  };
+
   const handleCopy = () => {
     if (maskedTransfer) {
       navigator.clipboard.writeText(formatJSON(maskedTransfer));
@@ -147,7 +165,7 @@ const FundTransferDetailModal = ({
                 </div>
                 <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
                   <div className="text-xs text-gray-600 dark:text-slate-400 mb-1 transition-colors">Amount</div>
-                  <div className="text-lg font-bold font-mono text-gray-900 dark:text-white transition-colors">{formatThaiBaht(transfer.amount)}</div>
+                  <div className="text-lg font-bold font-mono text-gray-900 dark:text-white transition-colors">{formatCurrency(transfer.amount, transfer.fromAccountNo, transfer.toAccountNo)}</div>
                 </div>
                 <div className="bg-gray-50 dark:bg-slate-800/50 p-4 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
                   <div className="text-xs text-gray-600 dark:text-slate-400 mb-1 transition-colors">Service Bank</div>
