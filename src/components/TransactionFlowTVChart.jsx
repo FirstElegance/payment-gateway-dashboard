@@ -33,6 +33,7 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
   isFullscreen = false,
 }, ref) {
   const wrapperRef = useRef(null);
+  const chartAreaRef = useRef(null);
   const containerRef = useRef(null);
   const chartRef = useRef(null);
   const seriesRef = useRef({ success: null, failed: null });
@@ -167,7 +168,7 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
 
     // Create chart once
     const isDark = theme === 'dark';
-    const sizeEl = wrapperRef.current || containerRef.current;
+    const sizeEl = chartAreaRef.current || containerRef.current;
     const initialWidth = sizeEl?.clientWidth || containerRef.current.clientWidth || undefined;
     const initialHeight = sizeEl?.clientHeight || containerRef.current.clientHeight || height;
     const chart = createChart(containerRef.current, {
@@ -449,8 +450,8 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
       const nextHeight = Math.floor(entry.contentRect.height);
       chart.applyOptions({ width: nextWidth, height: nextHeight });
     });
-    // Observe wrapper (more reliable sizing), fallback to container
-    ro.observe(wrapperRef.current || containerRef.current);
+    // Observe chart area only (exclude legend height)
+    ro.observe(chartAreaRef.current || containerRef.current);
 
     return () => {
       ro.disconnect();
@@ -589,57 +590,48 @@ const TransactionFlowTVChart = forwardRef(function TransactionFlowTVChart({
   }, [data]);
 
   return (
-    <div ref={wrapperRef} style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Legend: Area/Line chart */}
+    <div ref={wrapperRef} className="flex flex-col w-full h-full min-h-0">
+      {/* Legend: above chart so it wraps cleanly on mobile */}
       <div
-        style={{
-          position: 'absolute',
-          left: 10,
-          top: 8,
-          zIndex: 2,
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 10,
-          fontSize: 11,
-          color: theme === 'dark' ? '#cbd5e1' : '#334155',
-          userSelect: 'none',
-          pointerEvents: 'none',
-        }}
+        className="shrink-0 flex flex-wrap gap-x-3 gap-y-1 pb-2 text-[10px] sm:text-[11px] select-none pointer-events-none"
+        style={{ color: theme === 'dark' ? '#cbd5e1' : '#334155' }}
       >
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 18, height: 0, borderTop: '3px solid #16a34a' }} /> Buy (Success)
+        <span className="inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <span className="w-4 sm:w-[18px] border-t-[3px] border-solid border-green-600" /> Buy (Success)
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 18, height: 0, borderTop: '3px dashed #ef4444' }} /> Buy (Failed) 
+        <span className="inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <span className="w-4 sm:w-[18px] border-t-[3px] border-dashed border-red-500" /> Buy (Failed)
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 18, height: 0, borderTop: '3px solid #dc2626' }} /> Sell (Success)
+        <span className="inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <span className="w-4 sm:w-[18px] border-t-[3px] border-solid border-red-600" /> Sell (Success)
         </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 18, height: 0, borderTop: '3px dashed #f97316' }} /> Sell (Failed)
+        <span className="inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+          <span className="w-4 sm:w-[18px] border-t-[3px] border-dashed border-orange-500" /> Sell (Failed)
         </span>
       </div>
-      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
-      <div
-        ref={tooltipRef}
-        style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          width: isFullscreen ? 600 : 400,
-          pointerEvents: 'none',
-          opacity: 0,
-          transform: 'translate(10px, 10px)',
-          background: theme === 'dark' ? 'rgba(15,23,42,0.92)' : 'rgba(255,255,255,0.92)',
-          border: theme === 'dark' ? '1px solid rgba(51,65,85,0.7)' : '1px solid rgba(226,232,240,0.9)',
-          borderRadius: 12,
-          padding: 10,
-          boxShadow: theme === 'dark'
-            ? '0 10px 30px rgba(0,0,0,0.35)'
-            : '0 10px 30px rgba(2,6,23,0.12)',
-          backdropFilter: 'blur(8px)',
-        }}
-      />
+      <div ref={chartAreaRef} className="relative flex-1 min-h-0 w-full">
+        <div ref={containerRef} className="w-full h-full" />
+        <div
+          ref={tooltipRef}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: isFullscreen ? 600 : 400,
+            pointerEvents: 'none',
+            opacity: 0,
+            transform: 'translate(10px, 10px)',
+            background: theme === 'dark' ? 'rgba(15,23,42,0.92)' : 'rgba(255,255,255,0.92)',
+            border: theme === 'dark' ? '1px solid rgba(51,65,85,0.7)' : '1px solid rgba(226,232,240,0.9)',
+            borderRadius: 12,
+            padding: 10,
+            boxShadow: theme === 'dark'
+              ? '0 10px 30px rgba(0,0,0,0.35)'
+              : '0 10px 30px rgba(2,6,23,0.12)',
+            backdropFilter: 'blur(8px)',
+          }}
+        />
+      </div>
     </div>
   );
 });

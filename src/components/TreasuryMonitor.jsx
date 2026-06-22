@@ -227,23 +227,38 @@ const TreasuryMonitor = () => {
 
       {/* Summary Footer */}
       {Array.isArray(bankInfo) && bankInfo.length > 0 && (
-        <div className="px-5 py-3 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 transition-colors">
-          <div className="grid grid-cols-4 gap-4 text-xs">
-            <div>
+        <div className="px-3 sm:px-5 py-3 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 transition-colors">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs">
+            <div className="min-w-0">
               <div className="text-gray-500 dark:text-slate-400 mb-1 transition-colors">Total Banks</div>
               <div className="text-gray-900 dark:text-white font-bold transition-colors">{bankInfo.length}</div>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-gray-500 dark:text-slate-400 mb-1 transition-colors">Cash In</div>
-              <div className="text-green-600 dark:text-green-400 font-mono font-bold transition-colors">{formatThaiBaht(totals.totalImport || 0)}</div>
+              <div
+                className="text-green-600 dark:text-green-400 font-mono font-bold text-[11px] sm:text-xs truncate transition-colors"
+                title={formatThaiBaht(totals.totalImport || 0)}
+              >
+                {formatThaiBaht(totals.totalImport || 0)}
+              </div>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-gray-500 dark:text-slate-400 mb-1 transition-colors">Cash Out</div>
-              <div className="text-red-600 dark:text-red-400 font-mono font-bold transition-colors">{formatThaiBaht(totals.totalExport || 0)}</div>
+              <div
+                className="text-red-600 dark:text-red-400 font-mono font-bold text-[11px] sm:text-xs truncate transition-colors"
+                title={formatThaiBaht(totals.totalExport || 0)}
+              >
+                {formatThaiBaht(totals.totalExport || 0)}
+              </div>
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-gray-500 dark:text-slate-400 mb-1 transition-colors">Net Balance</div>
-              <div className="text-blue-600 dark:text-blue-400 font-mono font-bold transition-colors">{formatThaiBaht(totals.netBalance || 0)}</div>
+              <div
+                className="text-blue-600 dark:text-blue-400 font-mono font-bold text-[11px] sm:text-xs truncate transition-colors"
+                title={formatThaiBaht(totals.netBalance || 0)}
+              >
+                {formatThaiBaht(totals.netBalance || 0)}
+              </div>
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700 text-xs text-gray-500 dark:text-slate-400 transition-colors">
