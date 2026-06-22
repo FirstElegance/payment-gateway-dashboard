@@ -1826,7 +1826,7 @@ const Dashboard = () => {
   return (
     <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* KPI Cards */}
-      <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'
+      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4  ${activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
         }`}>
         {/* Net Total Payments - Always shown regardless of tab */}
         <div className="min-w-0 overflow-hidden bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Net Total = Sell (Fund Transfers) - Buy (Payments)">
