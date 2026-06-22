@@ -226,14 +226,14 @@ const BankConfigList = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 w-full space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-5 shadow-sm transition-colors">
-        <div className="flex justify-between items-center">
+      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-4 sm:p-5 shadow-sm transition-colors">
+        <div className="flex flex-wrap justify-between items-center gap-3">
           <div className="flex items-center gap-3">
-            <Settings className="w-6 h-6 text-red-600 dark:text-red-400 transition-colors" />
+            <Settings className="w-6 h-6 text-red-600 dark:text-red-400 transition-colors flex-shrink-0" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">Configurations</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white transition-colors">Configurations</h1>
               <p className="text-xs text-gray-600 dark:text-slate-400 mt-1 transition-colors">Manage business layer and bank configuration settings</p>
             </div>
           </div>
@@ -420,7 +420,7 @@ const BankConfigList = () => {
                       key={bank.id}
                       className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-4 transition-colors"
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
                         {iconPath && (
                           <img 
                             src={iconPath} 

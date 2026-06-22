@@ -119,11 +119,11 @@ const FundTransferDetailModal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md transition-colors">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-md transition-colors overflow-y-auto">
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col transition-colors">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center transition-colors">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white transition-colors">Fund Transfer Details</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center transition-colors">
+          <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white transition-colors">Fund Transfer Details</h2>
           <button
             onClick={onClose}
             title="Close"
@@ -134,7 +134,7 @@ const FundTransferDetailModal = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {loading && (
             <div className="flex justify-center py-8">
               <AppLoading size="sm" text="Loading..." />
@@ -286,7 +286,7 @@ const FundTransferDetailModal = ({
 
               {/* Full JSON View */}
               <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                   <button
                     onClick={() => setShowJsonDetails(!showJsonDetails)}
                     className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
@@ -298,7 +298,7 @@ const FundTransferDetailModal = ({
                     )}
                     Full Details (JSON)
                   </button>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={handleCopy}
                       className="flex items-center gap-1 px-2 py-1 bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 rounded text-xs text-gray-900 dark:text-white transition-colors"
@@ -313,10 +313,10 @@ const FundTransferDetailModal = ({
                       <Download className="w-3 h-3" />
                       Export
                     </button>
+                    <span className="text-xs text-gray-600 dark:text-slate-400 bg-yellow-500/20 px-2 py-1 rounded transition-colors">
+                      Sensitive values masked
+                    </span>
                   </div>
-                  <span className="text-xs text-gray-600 dark:text-slate-400 bg-yellow-500/20 px-2 py-1 rounded transition-colors">
-                    Sensitive values masked
-                  </span>
                 </div>
                 {showJsonDetails && maskedTransfer && (
                   <div className="mt-3 pt-2 pb-2">

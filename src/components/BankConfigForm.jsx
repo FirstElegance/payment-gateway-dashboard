@@ -167,11 +167,11 @@ const BankConfigForm = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-4xl mx-auto overflow-x-hidden space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-5">
-        <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-4 sm:p-5">
+        <div className="flex flex-wrap justify-between items-center gap-3">
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
             {isEditMode ? 'Edit' : 'Create'} Bank Configuration
           </h1>
           <button
@@ -184,13 +184,13 @@ const BankConfigForm = () => {
       </div>
 
       {/* Steps Indicator */}
-      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-6">
+      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-4 sm:p-6">
         <div className="flex items-center justify-between">
           {[1, 2, 3].map((stepNum) => (
             <div key={stepNum} className="flex items-center flex-1">
               <div className="flex flex-col items-center flex-1">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition ${
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base transition ${
                     step >= stepNum
                       ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
                       : 'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-400'

@@ -177,12 +177,12 @@ const PaymentDetailModal = ({
       />
       
       {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className="flex min-h-full items-center justify-center p-3 sm:p-4">
         <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col transition-colors">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center flex-shrink-0 transition-colors">
+          <div className="px-4 sm:px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-between items-center flex-shrink-0 transition-colors">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white transition-colors">Payment Details</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white transition-colors">Payment Details</h3>
               {/* {payment && (
                 <p className="text-xs text-slate-400 mt-1">ID: {payment.id}</p>
               )} */}
@@ -217,7 +217,7 @@ const PaymentDetailModal = ({
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6">
             {loading && (
               <div className="flex justify-center items-center py-12">
                 <AppLoading size="sm" text="Loading payment details..." />
@@ -329,8 +329,8 @@ const PaymentDetailModal = ({
                 </div>
 
                 {/* Full JSON View */}
-                <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
-                  <div className="flex justify-between items-center mb-4">
+                <div className="bg-gray-50 dark:bg-slate-800/50 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors">
+                  <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
                     <button
                       onClick={() => setShowJsonDetails(!showJsonDetails)}
                       className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
@@ -361,7 +361,7 @@ const PaymentDetailModal = ({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-slate-700 bg-slate-800/50 flex justify-end flex-shrink-0">
+          <div className="px-4 sm:px-6 py-4 border-t border-slate-700 bg-slate-800/50 flex justify-end flex-shrink-0">
             <button
               onClick={onClose}
               title="Close modal"

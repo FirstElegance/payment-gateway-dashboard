@@ -241,7 +241,7 @@ const QrPaymentsList = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-200 p-4 md:p-6 transition-colors">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-200 p-3 sm:p-4 md:p-6 transition-colors">
       <div className="w-full">
         {/* Header */}
         <div className="mb-6">
@@ -254,9 +254,9 @@ const QrPaymentsList = () => {
 
         {/* Filters */}
         <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm transition-colors">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1 max-w-md">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-slate-400 w-4 h-4 z-10 transition-colors" />
                 <input
                   type="text"
@@ -389,20 +389,20 @@ const QrPaymentsList = () => {
             </div>
           ) : (
             <>
-              <div>
-                <table className="w-full table-fixed">
+              <div className="overflow-x-auto">
+                <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 transition-colors">
                     <tr>
-                      <th style={{width: '3%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">No.</th>
-                      <th style={{width: '13%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Ref1</th>
-                      <th style={{width: '13%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Ref2</th>
-                      <th style={{width: '13%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Internal Ref</th>
-                      <th style={{width: '9%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Service Code</th>
-                      <th style={{width: '9%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Bank Code</th>
-                      <th style={{width: '10%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Amount</th>
-                      <th style={{width: '10%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Status</th>
-                      <th style={{width: '10%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Date</th>
-                      <th style={{width: '10%'}} className="px-3 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap transition-colors">Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">No.</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Ref1</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Ref2</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Internal Ref</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Service Code</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Bank Code</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Amount</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
@@ -415,32 +415,32 @@ const QrPaymentsList = () => {
                           className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                           onClick={() => setSelectedQrPaymentId(qrPayment.id)}
                         >
-                          <td className="px-3 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors">{rowNum}</td>
-                          <td className="px-3 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white font-mono text-xs truncate transition-colors" title={qrPayment.ref1}>{qrPayment.ref1 || '-'}</div>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors">{rowNum}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="text-gray-900 dark:text-white font-mono text-xs transition-colors">{qrPayment.ref1 || '-'}</div>
                           </td>
-                          <td className="px-3 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white font-mono text-xs truncate transition-colors" title={qrPayment.ref2}>{qrPayment.ref2 || '-'}</div>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="text-gray-900 dark:text-white font-mono text-xs transition-colors">{qrPayment.ref2 || '-'}</div>
                           </td>
-                          <td className="px-3 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white font-mono text-xs truncate transition-colors" title={qrPayment.internalRef}>{qrPayment.internalRef || '-'}</div>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="text-gray-900 dark:text-white font-mono text-xs transition-colors">{qrPayment.internalRef || '-'}</div>
                           </td>
-                          <td className="px-3 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white text-xs truncate transition-colors" title={qrPayment.serviceCode}>{qrPayment.serviceCode || '-'}</div>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="text-gray-900 dark:text-white text-xs transition-colors">{qrPayment.serviceCode || '-'}</div>
                           </td>
-                          <td className="px-3 py-3 text-sm">
+                          <td className="px-4 py-3 text-sm">
                             <div className="text-gray-900 dark:text-white font-mono text-xs transition-colors">{qrPayment.bankCode || '-'}</div>
                           </td>
-                          <td className="px-3 py-3 text-sm text-left">
-                            <div className="text-gray-900 dark:text-white font-bold font-mono whitespace-nowrap transition-colors">{formatThaiBaht(qrPayment.amountInBaht)}</div>
+                          <td className="px-4 py-3 text-sm text-right">
+                            <div className="text-gray-900 dark:text-white font-bold font-mono transition-colors">{formatThaiBaht(qrPayment.amountInBaht)}</div>
                           </td>
-                          <td className="px-3 py-3 text-sm text-left">
-                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium border whitespace-nowrap ${getStatusColor(qrPayment.status)}`}>
+                          <td className="px-4 py-3 text-sm">
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(qrPayment.status)}`}>
                               {qrPayment.status || '-'}
                             </span>
                           </td>
-                          <td className="px-3 py-3 text-sm text-gray-700 dark:text-slate-300 whitespace-nowrap transition-colors">{dateTime.date}</td>
-                          <td className="px-3 py-3 text-sm text-gray-600 dark:text-slate-400 font-mono whitespace-nowrap transition-colors">{dateTime.time}</td>
+                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 whitespace-nowrap transition-colors">{dateTime.date}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400 font-mono transition-colors">{dateTime.time}</td>
                         </tr>
                       );
                     })}
@@ -450,7 +450,7 @@ const QrPaymentsList = () => {
 
               {/* Pagination */}
               {pagination.total > 0 && (
-                <div className="px-4 py-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/30 flex items-center justify-between transition-colors">
+                <div className="px-4 py-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/30 flex flex-wrap items-center justify-between gap-2 transition-colors">
                   <div className="text-sm text-gray-600 dark:text-slate-400 transition-colors">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
                   </div>

@@ -1781,9 +1781,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 w-full space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* KPI Cards */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
+      <div className={`grid grid-cols-2 gap-3 sm:gap-4 ${activeTab === 'bank-registrations' ? 'lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-4'
         }`}>
         {/* Net Total Payments - Always shown regardless of tab */}
         <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Net Total = Sell (Fund Transfers) - Buy (Payments)">
@@ -1792,7 +1792,7 @@ const Dashboard = () => {
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">
                 Net Total Payments
               </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white font-mono mt-1 transition-colors">
+              <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white font-mono mt-1 transition-colors">
                 {formatThaiBaht(netTotalPayments.net)}
               </div>
             </div>
@@ -1815,7 +1815,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-start mb-2">
             <div>
               <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Success Rate</div>
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400 font-mono mt-1 transition-colors">{metrics.successRate.toFixed(1)}%</div>
+              <div className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400 font-mono mt-1 transition-colors">{metrics.successRate.toFixed(1)}%</div>
             </div>
             <Activity className="w-5 h-5 text-green-500 dark:text-green-400" />
           </div>
@@ -1831,7 +1831,7 @@ const Dashboard = () => {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-[10px] text-blue-700 dark:text-blue-300 font-bold uppercase tracking-wider transition-colors">Net Liquidity</div>
-                <div className="text-2xl font-bold text-blue-900 dark:text-blue-100 font-mono mt-1 transition-colors">
+                <div className="text-lg sm:text-2xl font-bold text-blue-900 dark:text-blue-100 font-mono mt-1 transition-colors">
                   {formatThaiBaht(totals.netBalance || 0)}
                 </div>
               </div>
@@ -1851,7 +1851,7 @@ const Dashboard = () => {
               <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider transition-colors">
                 New Members Today
               </div>
-              <div className="text-2xl font-bold text-emerald-900 dark:text-emerald-100 font-mono mt-1 transition-colors">
+              <div className="text-lg sm:text-2xl font-bold text-emerald-900 dark:text-emerald-100 font-mono mt-1 transition-colors">
                 {newMembersTodayCount}
               </div>
             </div>
@@ -1865,12 +1865,12 @@ const Dashboard = () => {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 gap-6 min-h-80">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 min-h-80">
         {/* Transaction Flow Chart - Hidden for Bank Registrations */}
         {activeTab !== 'bank-registrations' && (
-          <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-5 rounded-lg shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center gap-3 min-w-0">
+          <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-3 sm:p-5 rounded-lg shadow-sm">
+            <div className="flex flex-wrap justify-between items-center mb-4 gap-2">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
                 <h3 className="font-bold text-gray-900 dark:text-white text-sm transition-colors">
                   Transaction Flow
                 </h3>
@@ -2020,7 +2020,7 @@ const Dashboard = () => {
                 </button>
               </div>
             </div>
-            <div className="h-[32rem] relative">
+            <div className="h-64 sm:h-[32rem] relative">
               {transactionFlowLoading ? (
                 <TransactionFlowLoadingBadge />
               ) : (
@@ -2046,13 +2046,13 @@ const Dashboard = () => {
 
       {/* Transactions Table */}
       <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden transition-colors shadow-sm">
-        <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 transition-colors">
+        <div className="px-3 sm:px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 transition-colors">
           {/* Tabs */}
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2 mb-3 overflow-x-auto">
             <button
               onClick={() => setActiveTab('payments')}
               title="View Payments"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'payments'
+              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'payments'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
                   : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
                 }`}
@@ -2062,7 +2062,7 @@ const Dashboard = () => {
             <button
               onClick={() => setActiveTab('fund-transfers')}
               title="View Fund Transfers"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'fund-transfers'
+              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'fund-transfers'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
                   : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
                 }`}
@@ -2072,7 +2072,7 @@ const Dashboard = () => {
             <button
               onClick={() => setActiveTab('bank-registrations')}
               title="View Bank Registrations"
-              className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'bank-registrations'
+              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'bank-registrations'
                   ? 'bg-red-600 text-white scale-105 shadow-sm'
                   : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
                 }`}
@@ -2084,7 +2084,7 @@ const Dashboard = () => {
               <button
                 onClick={() => setActiveTab('qr-payments')}
                 title="View QR Payments"
-                className={`px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform ${activeTab === 'qr-payments'
+                className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'qr-payments'
                     ? 'bg-red-600 text-white scale-105 shadow-sm'
                     : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
                   }`}
@@ -2094,11 +2094,11 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
             <h3 className="font-bold text-gray-900 dark:text-white text-sm transition-colors">
               {activeTab === 'qr-payments' ? 'Recent Transactions Qr Payment' : 'Recent Transactions Online Direct Debit'}
             </h3>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <div className="text-[10px] text-gray-500 dark:text-slate-400 transition-colors">
                 Showing {
                   activeTab === 'payments' ? payments.length :
@@ -2807,7 +2807,7 @@ const Dashboard = () => {
 
         {/* Pagination */}
         {activeTab === 'payments' && pagination.total > 0 && (
-          <div className="px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex justify-between items-center transition-colors">
+          <div className="px-3 sm:px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex flex-wrap justify-between items-center gap-2 transition-colors">
             <div className="text-xs text-gray-600 dark:text-slate-400 transition-colors">
               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
             </div>
@@ -2833,7 +2833,7 @@ const Dashboard = () => {
           </div>
         )}
         {activeTab === 'fund-transfers' && fundTransferPagination.total > 0 && (
-          <div className="px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex justify-between items-center transition-colors">
+          <div className="px-3 sm:px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex flex-wrap justify-between items-center gap-2 transition-colors">
             <div className="text-xs text-gray-600 dark:text-slate-400 transition-colors">
               Showing {((fundTransferPagination.page - 1) * fundTransferPagination.limit) + 1} to {Math.min(fundTransferPagination.page * fundTransferPagination.limit, fundTransferPagination.total)} of {fundTransferPagination.total} results
             </div>
@@ -2859,7 +2859,7 @@ const Dashboard = () => {
           </div>
         )}
         {activeTab === 'bank-registrations' && bankRegistrationPagination.total > 0 && (
-          <div className="px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex justify-between items-center transition-colors">
+          <div className="px-3 sm:px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex flex-wrap justify-between items-center gap-2 transition-colors">
             <div className="text-xs text-gray-600 dark:text-slate-400 transition-colors">
               Showing {((bankRegistrationPagination.page - 1) * bankRegistrationPagination.limit) + 1} to {Math.min(bankRegistrationPagination.page * bankRegistrationPagination.limit, bankRegistrationPagination.total)} of {bankRegistrationPagination.total} results
             </div>
@@ -2885,7 +2885,7 @@ const Dashboard = () => {
           </div>
         )}
         {activeTab === 'qr-payments' && qrPaymentPagination.total > 0 && (
-          <div className="px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex justify-between items-center transition-colors">
+          <div className="px-3 sm:px-5 py-3 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 flex flex-wrap justify-between items-center gap-2 transition-colors">
             <div className="text-xs text-gray-600 dark:text-slate-400 transition-colors">
               Showing {((qrPaymentPagination.page - 1) * qrPaymentPagination.limit) + 1} to {Math.min(qrPaymentPagination.page * qrPaymentPagination.limit, qrPaymentPagination.total)} of {qrPaymentPagination.total} results
             </div>

@@ -758,14 +758,14 @@ const WalletTransactions = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 w-full space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6 bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* Header with Merchant Wallet Info */}
       <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
-        <div className="p-5">
+        <div className="p-3 sm:p-5">
           <div className="flex items-center gap-3 mb-4">
-            <Wallet className="w-6 h-6 text-red-600 dark:text-red-400 transition-colors" />
+            <Wallet className="w-6 h-6 text-red-600 dark:text-red-400 transition-colors flex-shrink-0" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white transition-colors">Wallet</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white transition-colors">Wallet</h1>
               <p className="text-xs text-gray-600 dark:text-slate-400 mt-1 transition-colors">Merchant wallet and all wallets management</p>
             </div>
           </div>
@@ -779,13 +779,13 @@ const WalletTransactions = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 transition-colors" title="Current balance">
                 <div className="text-xs text-gray-500 dark:text-slate-400 mb-1">Balance</div>
-                <div className="font-bold text-xl text-red-600 dark:text-red-400">
+                <div className="font-bold text-base sm:text-xl text-red-600 dark:text-red-400">
                   {formatThaiBaht(activeMerchantWallet.balance)}
                 </div>
               </div>
               <div className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 transition-colors" title="Available balance">
                 <div className="text-xs text-gray-500 dark:text-slate-400 mb-1">Available</div>
-                <div className="font-bold text-xl text-green-600 dark:text-green-400">
+                <div className="font-bold text-base sm:text-xl text-green-600 dark:text-green-400">
                   {formatThaiBaht(activeMerchantWallet.available)}
                 </div>
               </div>

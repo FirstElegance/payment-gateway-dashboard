@@ -312,10 +312,10 @@ const PaymentRegistrationsDashboard = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 w-full space-y-6 bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-200 transition-colors min-h-screen">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6 bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-200 transition-colors min-h-screen">
       {/* Header with Refresh Button */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Payment Registrations</h2>
+      <div className="flex flex-wrap justify-between items-center gap-2">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Payment Registrations</h2>
         <button
           onClick={loadPayments}
           className="h-8 px-4 bg-white dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 border border-gray-300 dark:border-slate-700 rounded text-xs font-bold text-gray-700 dark:text-slate-300 transition-colors"
@@ -324,13 +324,13 @@ const PaymentRegistrationsDashboard = () => {
         </button>
       </div>
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Total Amount */}
           <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm">
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-[10px] text-gray-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Total Amount (Today)</div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white font-mono mt-1 transition-colors">{formatThaiBaht(metrics.totalAmount)}</div>
+                <div className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white font-mono mt-1 transition-colors">{formatThaiBaht(metrics.totalAmount)}</div>
               </div>
               <TrendingUp className="w-5 h-5 text-green-500 dark:text-green-400 transition-colors" />
             </div>
@@ -344,7 +344,7 @@ const PaymentRegistrationsDashboard = () => {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-[10px] text-gray-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Success Rate</div>
-                <div className="text-2xl font-bold text-green-600 dark:text-green-400 font-mono mt-1 transition-colors">{metrics.successRate.toFixed(1)}%</div>
+                <div className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400 font-mono mt-1 transition-colors">{metrics.successRate.toFixed(1)}%</div>
               </div>
               <Activity className="w-5 h-5 text-green-500 dark:text-green-400 transition-colors" />
             </div>
@@ -359,7 +359,7 @@ const PaymentRegistrationsDashboard = () => {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-[10px] text-gray-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Pending Settlement</div>
-                <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400 font-mono mt-1 transition-colors">{metrics.pendingCount}</div>
+                <div className="text-lg sm:text-2xl font-bold text-yellow-600 dark:text-yellow-400 font-mono mt-1 transition-colors">{metrics.pendingCount}</div>
               </div>
               <AlertTriangle className="w-5 h-5 text-yellow-500 dark:text-yellow-500 transition-colors" />
             </div>
@@ -373,7 +373,7 @@ const PaymentRegistrationsDashboard = () => {
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="text-[10px] text-gray-600 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Failed Transactions</div>
-                <div className="text-2xl font-bold text-red-600 dark:text-red-400 font-mono mt-1 transition-colors">{metrics.failedCount}</div>
+                <div className="text-lg sm:text-2xl font-bold text-red-600 dark:text-red-400 font-mono mt-1 transition-colors">{metrics.failedCount}</div>
               </div>
               <TrendingDown className="w-5 h-5 text-red-500 dark:text-red-400 transition-colors" />
             </div>

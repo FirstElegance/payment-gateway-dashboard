@@ -136,10 +136,10 @@ const BankConfigView = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-5 shadow-sm transition-colors">
-        <div className="flex justify-between items-center">
+      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-4 sm:p-5 shadow-sm transition-colors">
+        <div className="flex flex-wrap justify-between items-center gap-3">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/bank-configs')}
@@ -148,7 +148,7 @@ const BankConfigView = () => {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Bank Configuration Details</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Bank Configuration Details</h1>
               <p className="text-xs text-gray-600 dark:text-slate-400 mt-1">{bankCode} / {serviceCode}</p>
             </div>
           </div>
@@ -203,11 +203,11 @@ const BankConfigView = () => {
       </div>
 
       {/* Configuration JSON */}
-      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-6">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg p-4 sm:p-6">
+        <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">Configuration</h2>
           <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-400">
-            <AlertTriangle className="w-3 h-3" />
+            <AlertTriangle className="w-3 h-3 flex-shrink-0" />
             Sensitive values are masked
           </div>
         </div>

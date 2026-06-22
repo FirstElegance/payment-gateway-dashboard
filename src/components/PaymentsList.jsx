@@ -247,7 +247,7 @@ const PaymentsList = () => {
   console.log('PaymentsList: Render', { loading, paymentsCount: payments.length, allPaymentsCount: allPayments.length });
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-200 p-4 md:p-6 transition-colors">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-slate-200 p-3 sm:p-4 md:p-6 transition-colors">
       <div className="w-full">
         {/* Header */}
         <div className="mb-6">
@@ -257,9 +257,9 @@ const PaymentsList = () => {
 
         {/* Filters */}
         <div className="bg-white dark:bg-slate-900/50 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-xl p-4 mb-6 shadow-sm transition-colors overflow-visible">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="relative flex-1 max-w-md">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-slate-400 w-4 h-4 z-10 transition-colors" />
                 <input
                   type="text"
@@ -529,7 +529,7 @@ const PaymentsList = () => {
 
               {/* Pagination */}
               {pagination.total > 0 && (
-                <div className="px-4 py-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/30 flex items-center justify-between transition-colors">
+                <div className="px-4 py-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/30 flex flex-wrap items-center justify-between gap-2 transition-colors">
                   <div className="text-sm text-gray-600 dark:text-slate-400 transition-colors">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
                   </div>

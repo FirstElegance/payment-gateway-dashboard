@@ -152,10 +152,10 @@ const PaymentRegistrationsList = () => {
   }
 
   return (
-    <div className="p-4 md:p-6 w-full bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
+    <div className="p-3 sm:p-4 md:p-6 w-full max-w-full overflow-x-hidden bg-gray-50 dark:bg-slate-950 min-h-screen transition-colors">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">ELEGANCE PAYMENT</h1>
+      <div className="flex flex-wrap justify-between items-center gap-2 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white transition-colors">ELEGANCE PAYMENT</h1>
         <button
           onClick={loadPayments}
           className="px-4 py-2 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-300 rounded-md border border-gray-300 dark:border-slate-700 transition-colors"

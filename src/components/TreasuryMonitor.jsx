@@ -135,7 +135,7 @@ const TreasuryMonitor = () => {
 
   return (
     <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden shadow-sm transition-colors">
-      <div className="px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center transition-colors">
+      <div className="px-3 sm:px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-between items-center transition-colors">
         <h3 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2 transition-colors">
           <Landmark className="w-4 h-4 text-gray-500 dark:text-slate-400 transition-colors" />
           Treasury Monitor
@@ -147,7 +147,8 @@ const TreasuryMonitor = () => {
           Refresh
         </button> */}
       </div>
-      <table className="w-full text-left text-xs table-fixed">
+      <div className="overflow-x-auto">
+      <table className="w-full text-left text-xs table-fixed min-w-[500px]">
         <colgroup>
           <col className="w-[35%]" />
           <col className="w-[20%]" />
@@ -222,7 +223,8 @@ const TreasuryMonitor = () => {
           )}
         </tbody>
       </table>
-      
+      </div>
+
       {/* Summary Footer */}
       {Array.isArray(bankInfo) && bankInfo.length > 0 && (
         <div className="px-5 py-3 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/30 transition-colors">

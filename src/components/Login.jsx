@@ -45,7 +45,7 @@ const Login = () => {
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md">
         {/* Glassmorphism Card */}
-        <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-8 transition-colors">
+        <div className="bg-white/90 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 transition-colors">
           {/* Logo/Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-20 h-20 mb-4 p-3">

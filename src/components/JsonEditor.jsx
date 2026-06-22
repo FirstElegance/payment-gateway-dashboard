@@ -189,35 +189,35 @@ const JsonEditor = ({
   return (
     <div className={`json-editor ${className} pt-4 pb-4`}>
       {/* Toolbar */}
-      <div className="bg-slate-100 dark:bg-slate-800/50 border-b border-slate-300 dark:border-slate-700 rounded-t-lg px-4 py-3 flex justify-between items-center transition-colors">
-        <div className="flex items-center gap-3">
-          <Code2 className="w-4 h-4 text-slate-600 dark:text-slate-400 transition-colors" />
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider transition-colors">JSON Editor</span>
+      <div className="bg-slate-100 dark:bg-slate-800/50 border-b border-slate-300 dark:border-slate-700 rounded-t-lg px-2 sm:px-4 py-2 sm:py-3 flex flex-wrap justify-between items-center gap-2 transition-colors">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Code2 className="w-4 h-4 text-slate-600 dark:text-slate-400 transition-colors flex-shrink-0" />
+          <span className="text-xs font-semibold text-slate-700 dark:text-slate-400 uppercase tracking-wider transition-colors hidden sm:inline">JSON Editor</span>
         </div>
-        
-        <div className="flex items-center gap-3">
+
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Status Indicator */}
           {error && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-red-500/20 border border-red-500/30 rounded text-xs text-red-400">
-              <AlertTriangle className="w-3 h-3" />
-              <span>Invalid JSON</span>
+            <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-red-500/20 border border-red-500/30 rounded text-xs text-red-400">
+              <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+              <span className="hidden sm:inline">Invalid JSON</span>
             </div>
           )}
           {!error && !isFormatted && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-400">
-              <AlertTriangle className="w-3 h-3" />
-              <span>Not formatted</span>
+            <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-400">
+              <AlertTriangle className="w-3 h-3 flex-shrink-0" />
+              <span className="hidden sm:inline">Not formatted</span>
             </div>
           )}
           {!error && isFormatted && (
-            <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded text-xs text-green-400">
-              <Check className="w-3 h-3" />
-              <span>Valid JSON</span>
+            <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 bg-green-500/20 border border-green-500/30 rounded text-xs text-green-400">
+              <Check className="w-3 h-3 flex-shrink-0" />
+              <span className="hidden sm:inline">Valid JSON</span>
             </div>
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2 pl-3 border-l border-slate-300 dark:border-slate-700 transition-colors">
+          <div className="flex items-center gap-2 sm:pl-3 sm:border-l border-slate-300 dark:border-slate-700 transition-colors">
             {!readOnly && (
               <button
                 type="button"
@@ -263,7 +263,7 @@ const JsonEditor = ({
             tabSize: 2,
             formatOnPaste: true,
             formatOnType: true,
-            wordWrap: 'on',
+            wordWrap: 'off',
             theme: isDark ? 'elegance-dark' : 'elegance-light',
             lineHeight: 22,
             fontFamily: "'JetBrains Mono', 'Consolas', 'Courier New', monospace",
