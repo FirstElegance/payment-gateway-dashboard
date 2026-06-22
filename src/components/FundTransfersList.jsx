@@ -164,21 +164,26 @@ const FundTransfersList = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return { date: '-', time: '-' };
+    if (!dateString) return { date: '-', time: '-', dateShort: '-' };
     try {
       const date = new Date(dateString);
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const day = date.getDate();
       const month = months[date.getMonth()];
       const year = date.getFullYear();
-      const dateStr = `${day} ${month} ${year}`;
+      const dd = String(day).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yy = String(year).slice(-2);
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
-      const timeStr = `${hours}:${minutes}:${seconds}`;
-      return { date: dateStr, time: timeStr };
+      return {
+        date: `${day} ${month} ${year}`,
+        dateShort: `${dd}/${mm}/${yy}`,
+        time: `${hours}:${minutes}:${seconds}`,
+      };
     } catch {
-      return { date: dateString, time: '' };
+      return { date: dateString, time: '', dateShort: dateString };
     }
   };
 
@@ -456,66 +461,132 @@ const FundTransfersList = () => {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              {/* Mobile cards */}
+              <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-800">
+                {transfers.map((transfer, index) => {
+                  const dateTime = formatDate(transfer.createdAt || transfer.requestDateTime);
+                  const rowNum = (pagination.page - 1) * pagination.limit + index + 1;
+                  const ref = transfer.ref1 || '-';
+                  const transId = transfer.rsTransID || '-';
+                  const memberName = transfer.member?.name || '-';
+                  const transferStatus = transfer.transferStatus || transfer.inquiryStatus || transfer.status || '-';
+                  const amount = formatCurrency(transfer.amount, transfer.fromAccountNo, transfer.toAccountNo);
+
+                  return (
+                    <div
+                      key={transfer.id}
+                      className="px-3 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors"
+                      onClick={() => setSelectedTransferId(transfer.id)}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNum}</div>
+                          <div className="font-mono text-base font-medium text-gray-900 dark:text-white break-all">{ref}</div>
+                        </div>
+                        <span className={`shrink-0 inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(transferStatus)}`}>
+                          {transferStatus}
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 text-sm">
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Trans ID</span>
+                          <span className="font-mono text-gray-900 dark:text-white text-right break-all">{transId}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Bank</span>
+                          <span className="text-gray-900 dark:text-white text-right whitespace-nowrap">
+                            {transfer.serviceBankName || '-'} <span className="text-gray-500 dark:text-slate-400">({transfer.serviceBankCode || '-'})</span>
+                          </span>
+                        </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Member</span>
+                          <div className="text-right min-w-0">
+                            <div className="font-sans text-gray-900 dark:text-white whitespace-nowrap overflow-x-auto" title={memberName}>{memberName}</div>
+                            {transfer.member?.citizenId ? (
+                              <div className="font-mono text-gray-500 dark:text-slate-400 whitespace-nowrap">{transfer.member.citizenId}</div>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Accounts</span>
+                          <span className="font-mono text-gray-900 dark:text-white text-right break-all">
+                            {transfer.fromAccountNo || '-'} → {transfer.toAccountNo || '-'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Amount</span>
+                          <span className="font-mono font-bold text-gray-900 dark:text-white whitespace-nowrap">{amount}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Created</span>
+                          <span className="font-mono text-gray-700 dark:text-slate-300 whitespace-nowrap">
+                            {dateTime.dateShort} {dateTime.time}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full min-w-[1200px] text-sm">
                   <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 transition-colors">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">No.</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Ref</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Trans ID</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Bank</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Member</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Accounts</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Amount</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider w-32 transition-colors">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider w-24 transition-colors">Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">No.</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Ref</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Trans ID</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Bank</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Member</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Accounts</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
                     {transfers.map((transfer, index) => {
                       const dateTime = formatDate(transfer.createdAt || transfer.requestDateTime);
                       const rowNum = (pagination.page - 1) * pagination.limit + index + 1;
+                      const memberName = transfer.member?.name || '-';
+                      const transferStatus = transfer.transferStatus || transfer.inquiryStatus || transfer.status || '-';
                       return (
                         <tr
                           key={transfer.id}
                           className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                           onClick={() => setSelectedTransferId(transfer.id)}
                         >
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors">{rowNum}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white text-xs transition-colors">{transfer.ref1 || '-'}</div>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-nowrap">{rowNum}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white">{transfer.ref1 || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white font-mono text-xs transition-colors">{transfer.rsTransID || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-mono text-xs">{transfer.rsTransID || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white transition-colors">{transfer.serviceBankName || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 transition-colors">{transfer.serviceBankCode || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white">{transfer.serviceBankName || '-'}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500">{transfer.serviceBankCode || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white text-xs transition-colors">{transfer.member?.name || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 transition-colors">{transfer.member?.citizenId || ''}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-sans whitespace-nowrap" title={memberName}>{memberName}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500 whitespace-nowrap">{transfer.member?.citizenId || ''}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white text-xs transition-colors">{transfer.fromAccountNo || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 transition-colors">→ {transfer.toAccountNo || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white">{transfer.fromAccountNo || '-'}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500">→ {transfer.toAccountNo || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm text-right">
-                            <div className="text-gray-900 dark:text-white font-bold font-mono transition-colors">{formatCurrency(transfer.amount, transfer.fromAccountNo, transfer.toAccountNo)}</div>
+                          <td className="px-4 py-3 text-right whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-bold font-mono">{formatCurrency(transfer.amount, transfer.fromAccountNo, transfer.toAccountNo)}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            {(() => {
-                              const transferStatus = transfer.transferStatus || transfer.inquiryStatus || transfer.status || '-';
-                              return (
-                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(transferStatus)}`}>
-                                  {transferStatus}
-                                </span>
-                              );
-                            })()}
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(transferStatus)}`}>
+                              {transferStatus}
+                            </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors whitespace-nowrap">{dateTime.date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400 font-mono transition-colors whitespace-nowrap">{dateTime.time}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-nowrap">{dateTime.date}</td>
+                          <td className="px-4 py-3 text-gray-600 dark:text-slate-400 font-mono whitespace-nowrap">{dateTime.time}</td>
                         </tr>
                       );
                     })}

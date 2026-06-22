@@ -151,21 +151,26 @@ const BankRegistrationsList = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return { date: '-', time: '-' };
+    if (!dateString) return { date: '-', time: '-', dateShort: '-' };
     try {
       const date = new Date(dateString);
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const day = date.getDate();
       const month = months[date.getMonth()];
       const year = date.getFullYear();
-      const dateStr = `${day} ${month} ${year}`;
+      const dd = String(day).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yy = String(year).slice(-2);
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
-      const timeStr = `${hours}:${minutes}:${seconds}`;
-      return { date: dateStr, time: timeStr };
+      return {
+        date: `${day} ${month} ${year}`,
+        dateShort: `${dd}/${mm}/${yy}`,
+        time: `${hours}:${minutes}:${seconds}`,
+      };
     } catch {
-      return { date: dateString, time: '' };
+      return { date: dateString, time: '', dateShort: dateString };
     }
   };
 
@@ -373,48 +378,103 @@ const BankRegistrationsList = () => {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              {/* Mobile cards */}
+              <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-800">
+                {registrations.map((reg, index) => {
+                  const dateTime = formatDate(reg.createdAt);
+                  const rowNum = (pagination.page - 1) * pagination.limit + index + 1;
+                  const memberName = reg.member?.name || '-';
+                  const citizenId = reg.member?.citizenId || '-';
+
+                  return (
+                    <div
+                      key={reg.id}
+                      className="px-3 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors"
+                      onClick={() => setSelectedRegistrationId(reg.id)}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNum}</div>
+                          <div className="font-mono text-base font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                            {reg.regRef || '-'}
+                          </div>
+                        </div>
+                        <span className={`shrink-0 inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(reg.status)}`}>
+                          {reg.status || '-'}
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 text-sm">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Bank</span>
+                          <span className="text-gray-900 dark:text-white text-right whitespace-nowrap">
+                            {reg.bankName || '-'} <span className="text-gray-500 dark:text-slate-400">({reg.bankCode || '-'})</span>
+                          </span>
+                        </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Member</span>
+                          <div className="text-right min-w-0">
+                            <div className="font-sans text-gray-900 dark:text-white whitespace-nowrap overflow-x-auto" title={memberName}>
+                              {memberName}
+                            </div>
+                            <div className="font-mono text-gray-500 dark:text-slate-400 whitespace-nowrap">{citizenId}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Created</span>
+                          <span className="font-mono text-gray-700 dark:text-slate-300 whitespace-nowrap">
+                            {dateTime.dateShort} {dateTime.time}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full min-w-[900px] text-sm">
                   <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 transition-colors">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">No.</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Reg Ref</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Bank</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Member</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">No.</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Reg Ref</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Bank</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Member</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
                     {registrations.map((reg, index) => {
                       const dateTime = formatDate(reg.createdAt);
                       const rowNum = (pagination.page - 1) * pagination.limit + index + 1;
+                      const memberName = reg.member?.name || '-';
                       return (
                         <tr
                           key={reg.id}
                           className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                           onClick={() => setSelectedRegistrationId(reg.id)}
                         >
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors">{rowNum}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="font-mono text-gray-900 dark:text-white transition-colors">{reg.regRef || '-'}</div>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 transition-colors whitespace-nowrap">{rowNum}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="font-mono text-gray-900 dark:text-white">{reg.regRef || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white transition-colors">{reg.bankName || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 transition-colors">{reg.bankCode || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white">{reg.bankName || '-'}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500">{reg.bankCode || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white transition-colors">{reg.member?.name || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 font-mono transition-colors">{reg.member?.citizenId || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-sans whitespace-nowrap" title={memberName}>{memberName}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500 font-mono whitespace-nowrap">{reg.member?.citizenId || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(reg.status)}`}>
                               {reg.status || '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors">{dateTime.date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400 font-mono transition-colors">{dateTime.time}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-nowrap">{dateTime.date}</td>
+                          <td className="px-4 py-3 text-gray-600 dark:text-slate-400 font-mono whitespace-nowrap">{dateTime.time}</td>
                         </tr>
                       );
                     })}

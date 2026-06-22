@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "predev": "node scripts/generate-pwa-icons.mjs",
+    "build": "node scripts/generate-pwa-icons.mjs && vite build",
+    "generate:pwa-icons": "node scripts/generate-pwa-icons.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -38,6 +40,8 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
-    "vite": "^7.2.4"
+    "sharp": "^0.35.2",
+    "vite": "^7.2.4",
+    "vite-plugin-pwa": "^1.3.0"
   }
 }

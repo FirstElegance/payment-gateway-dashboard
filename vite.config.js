@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -25,17 +26,17 @@ export default defineConfig(({ mode }) => {
         return url;
       }
 
-      // Static assets (js, css, images, fonts, …)
+      // Static assets
       if (/\.[a-zA-Z0-9]+$/.test(url)) {
         return url;
       }
 
-      // Browser navigation → SPA (e.g. /bank-configs, /wallet, /members)
+      // Browser navigation → SPA
       if (req.headers.accept?.includes("text/html")) {
         return url;
       }
 
-      // Everything else (axios/fetch API calls) → backend
+      // API → backend
       return null;
     },
     ...(normalizedToken && {
@@ -48,10 +49,66 @@ export default defineConfig(({ mode }) => {
   };
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      VitePWA({
+        registerType: "autoUpdate",
+        devOptions: {
+          enabled: true,
+        },
+        includeAssets: ["ec-icon.png", "pwa/*.png", "icon_bank/*.png"],
+        manifest: {
+          name: "EC Payment Gateway - Admin",
+          short_name: "EC Admin",
+          description: "ELEGANCE Payment Gateway Admin Dashboard",
+          theme_color: "#dc2626",
+          background_color: "#ffffff",
+          display: "standalone",
+          orientation: "any",
+          start_url: "/",
+          scope: "/",
+          icons: [
+            {
+              src: "/pwa/icon-192-round.png",
+              sizes: "192x192",
+              type: "image/png",
+              purpose: "any",
+            },
+            {
+              src: "/pwa/icon-512-round.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any",
+            },
+            {
+              src: "/ec-icon.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any",
+            },
+            {
+              src: "/pwa/icon-512-maskable.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
+            },
+          ],
+        },
+        workbox: {
+          globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+          navigateFallback: "/index.html",
+          navigateFallbackDenylist: [/^\/api\//],
+        },
+      }),
+    ],
+
     server: {
+      host: true,
+
+      // อนุญาตทุก Host (เหมาะสำหรับ ngrok)
+      allowedHosts: true,
+
       proxy: {
-        // All API paths — no /api prefix; bypass keeps SPA routes on Vite
         "^/(?!@|node_modules|src/).*": proxyOptions,
       },
     },

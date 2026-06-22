@@ -1324,6 +1324,70 @@ const Dashboard = () => {
     );
   };
 
+  const renderMemberCell = (member) => {
+    const name = member?.name || '-';
+    const citizenId = member?.citizenId || '';
+    return (
+      <td className="px-2 sm:px-5 py-3 whitespace-nowrap">
+        <div className="text-slate-800 dark:text-slate-300 font-sans whitespace-nowrap" title={name}>
+          {name}
+        </div>
+        {citizenId ? (
+          <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap" title={citizenId}>
+            {citizenId}
+          </div>
+        ) : null}
+      </td>
+    );
+  };
+
+  const getTableStatusStyle = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'success':
+        return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+      case 'failed':
+      case 'error':
+        return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+      case 'pending':
+        return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
+      default:
+        return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+    }
+  };
+
+  const getRegistrationStatusStyle = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'SUCCESS':
+        return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+      case 'FAILED':
+        return { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' };
+      case 'PENDING':
+        return { bg: 'bg-yellow-500/20', text: 'text-yellow-400', border: 'border-yellow-500/30' };
+      default:
+        return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+    }
+  };
+
+  const getQrStatusStyle = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'GENERATED':
+        return { bg: 'bg-green-500/20', text: 'text-green-400', border: 'border-green-500/30' };
+      case 'USED':
+        return { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' };
+      default:
+        return { bg: 'bg-slate-500/20', text: 'text-slate-400', border: 'border-slate-500/30' };
+    }
+  };
+
+  const renderMobileField = (label, value, { mono = false, bold = false, breakAll = false } = {}) => (
+    <div className="flex items-start justify-between gap-3">
+      <span className="shrink-0 text-gray-500 dark:text-slate-400">{label}</span>
+      <span className={`text-right min-w-0 ${mono ? 'font-mono' : ''} ${bold ? 'font-bold' : ''} ${breakAll ? 'break-all' : 'whitespace-nowrap'} text-slate-800 dark:text-slate-200`}>
+        {value}
+      </span>
+    </div>
+  );
+
   // Helper function to normalize bank name to standard format
   // Converts bankCode (014, 004, 002, 025) or various bank names to standard names (SCB, KBANK, BBL, BAY)
   const normalizeBankName = (bankName, bankCode = null) => {
@@ -1832,11 +1896,11 @@ const Dashboard = () => {
         <div className="min-w-0 overflow-hidden bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Net Total = Sell (Fund Transfers) - Buy (Payments)">
           <div className="flex justify-between items-start gap-2 mb-2">
             <div className="min-w-0 flex-1">
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">
+              <div className="text-xs sm:text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">
                 Net Total Payments
               </div>
               <div
-                className="text-sm sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white font-mono mt-1 transition-colors truncate"
+                className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white font-mono mt-1 transition-colors break-all leading-tight"
                 title={formatThaiBaht(netTotalPayments.net)}
               >
                 {formatThaiBaht(netTotalPayments.net)}
@@ -1844,11 +1908,11 @@ const Dashboard = () => {
             </div>
             <TrendingUp className="w-5 h-5 shrink-0 text-green-500 dark:text-green-400" />
           </div>
-          <div className="mt-2 text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700/50 pt-2 transition-colors">
+          <div className="mt-2 text-sm sm:text-xs text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700/50 pt-2 transition-colors">
             {paymentStats && fundTransferStats ? (
-              <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:gap-4">
-                <div className="truncate" title={formatThaiBaht(netTotalPayments.sell)}>Sell: {formatThaiBaht(netTotalPayments.sell)}</div>
-                <div className="truncate" title={formatThaiBaht(netTotalPayments.buy)}>Buy: {formatThaiBaht(netTotalPayments.buy)}</div>
+              <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-4">
+                <div className="break-all font-mono" title={formatThaiBaht(netTotalPayments.sell)}>Sell: {formatThaiBaht(netTotalPayments.sell)}</div>
+                <div className="break-all font-mono" title={formatThaiBaht(netTotalPayments.buy)}>Buy: {formatThaiBaht(netTotalPayments.buy)}</div>
               </div>
             ) : (
               <span>Net = Sell - Buy</span>
@@ -1860,14 +1924,14 @@ const Dashboard = () => {
         <div className="min-w-0 overflow-hidden bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 p-3 sm:p-4 rounded-lg hover:border-green-400 dark:hover:border-green-500/50 transition-colors shadow-sm" title="Percentage of successful transactions">
           <div className="flex justify-between items-start gap-2 mb-2">
             <div className="min-w-0 flex-1">
-              <div className="text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Success Rate</div>
-              <div className="text-sm sm:text-xl md:text-2xl font-bold text-green-600 dark:text-green-400 font-mono mt-1 transition-colors">{metrics.successRate.toFixed(1)}%</div>
+              <div className="text-xs sm:text-[10px] text-gray-500 dark:text-slate-400 font-bold uppercase tracking-wider transition-colors">Success Rate</div>
+              <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 font-mono mt-1 transition-colors">{metrics.successRate.toFixed(1)}%</div>
             </div>
             <Activity className="w-5 h-5 shrink-0 text-green-500 dark:text-green-400" />
           </div>
-          <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-end mt-2 text-[10px] text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700/50 pt-2 transition-colors">
-            <span>Success: {metrics.successCount}</span>
-            <span className="text-gray-600 dark:text-slate-300">Failed: {metrics.failedCount}</span>
+          <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-end mt-2 text-sm sm:text-xs text-gray-500 dark:text-slate-400 border-t border-gray-100 dark:border-slate-700/50 pt-2 transition-colors">
+            <span className="font-mono">Success: {metrics.successCount.toLocaleString()}</span>
+            <span className="font-mono text-gray-600 dark:text-slate-300">Failed: {metrics.failedCount.toLocaleString()}</span>
           </div>
         </div>
 
@@ -1876,9 +1940,9 @@ const Dashboard = () => {
           <div className="min-w-0 overflow-hidden bg-blue-50 dark:bg-slate-800/50 backdrop-blur-sm border border-blue-100 dark:border-slate-800 p-3 sm:p-4 rounded-lg hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors shadow-sm" title="Cash In - Cash Out">
             <div className="flex justify-between items-start gap-2 mb-2">
               <div className="min-w-0 flex-1">
-                <div className="text-[10px] text-blue-700 dark:text-blue-300 font-bold uppercase tracking-wider transition-colors">Net Liquidity</div>
+                <div className="text-xs sm:text-[10px] text-blue-700 dark:text-blue-300 font-bold uppercase tracking-wider transition-colors">Net Liquidity</div>
                 <div
-                  className="text-sm sm:text-xl md:text-2xl font-bold text-blue-900 dark:text-blue-100 font-mono mt-1 transition-colors truncate"
+                  className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100 font-mono mt-1 transition-colors break-all leading-tight"
                   title={formatThaiBaht(totals.netBalance || 0)}
                 >
                   {formatThaiBaht(totals.netBalance || 0)}
@@ -1886,9 +1950,9 @@ const Dashboard = () => {
               </div>
               <Wallet className="w-5 h-5 shrink-0 text-blue-600 dark:text-blue-400" />
             </div>
-            <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between text-[10px] text-gray-600 dark:text-slate-400 mt-3 border-t border-blue-100 dark:border-slate-700/50 pt-2 transition-colors">
-              <span className="truncate" title={formatThaiBaht(totals.totalImport || 0)}>Cash In: {formatThaiBaht(totals.totalImport || 0)}</span>
-              <span className="truncate" title={formatThaiBaht(totals.totalExport || 0)}>Cash Out: {formatThaiBaht(totals.totalExport || 0)}</span>
+            <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm sm:text-xs text-gray-600 dark:text-slate-400 mt-3 border-t border-blue-100 dark:border-slate-700/50 pt-2 transition-colors">
+              <span className="break-all font-mono" title={formatThaiBaht(totals.totalImport || 0)}>Cash In: {formatThaiBaht(totals.totalImport || 0)}</span>
+              <span className="break-all font-mono" title={formatThaiBaht(totals.totalExport || 0)}>Cash Out: {formatThaiBaht(totals.totalExport || 0)}</span>
             </div>
           </div>
         )}
@@ -1897,18 +1961,18 @@ const Dashboard = () => {
         <div className="min-w-0 overflow-hidden bg-emerald-50 dark:bg-slate-800/50 backdrop-blur-sm border border-emerald-100 dark:border-slate-800 p-3 sm:p-4 rounded-lg hover:border-emerald-300 dark:hover:border-emerald-500/50 transition-colors shadow-sm" title="New members registered today and total members">
           <div className="flex justify-between items-start gap-2 mb-2">
             <div className="min-w-0 flex-1">
-              <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider transition-colors">
+              <div className="text-xs sm:text-[10px] text-emerald-700 dark:text-emerald-300 font-bold uppercase tracking-wider transition-colors">
                 New Members Today
               </div>
-              <div className="text-sm sm:text-xl md:text-2xl font-bold text-emerald-900 dark:text-emerald-100 font-mono mt-1 transition-colors">
+              <div className="text-xl sm:text-2xl font-bold text-emerald-900 dark:text-emerald-100 font-mono mt-1 transition-colors">
                 {newMembersTodayCount}
               </div>
             </div>
             <Users className="w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="flex flex-col gap-0.5 sm:flex-row sm:justify-between sm:items-center text-[10px] text-gray-600 dark:text-slate-400 mt-3 border-t border-emerald-100 dark:border-slate-700/50 pt-2 transition-colors">
+          <div className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:items-center text-sm sm:text-xs text-gray-600 dark:text-slate-400 mt-3 border-t border-emerald-100 dark:border-slate-700/50 pt-2 transition-colors">
             <span>New members today</span>
-            <span className="font-bold text-emerald-700 dark:text-emerald-300 truncate">Total: {totalMembersCount.toLocaleString()}</span>
+            <span className="font-bold font-mono text-emerald-700 dark:text-emerald-300">Total: {totalMembersCount.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -2097,50 +2161,34 @@ const Dashboard = () => {
       <div className="bg-white dark:bg-slate-900/70 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-lg overflow-hidden transition-colors shadow-sm">
         <div className="px-3 sm:px-5 py-3 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 transition-colors">
           {/* Tabs */}
-          <div className="flex gap-2 mb-3 overflow-x-auto">
-            <button
-              onClick={() => setActiveTab('payments')}
-              title="View Payments"
-              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'payments'
-                  ? 'bg-red-600 text-white scale-105 shadow-sm'
-                  : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-                }`}
-            >
-              Payments
-            </button>
-            <button
-              onClick={() => setActiveTab('fund-transfers')}
-              title="View Fund Transfers"
-              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'fund-transfers'
-                  ? 'bg-red-600 text-white scale-105 shadow-sm'
-                  : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-                }`}
-            >
-              Fund Transfers
-            </button>
-            <button
-              onClick={() => setActiveTab('bank-registrations')}
-              title="View Bank Registrations"
-              className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'bank-registrations'
-                  ? 'bg-red-600 text-white scale-105 shadow-sm'
-                  : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
-                }`}
-            >
-              Bank Registrations
-            </button>
-            {/* QR Payments tab - แสดงเฉพาะเมื่อมี BILL_PAYMENT */}
-            {features.qrPayment && (
-              <button
-                onClick={() => setActiveTab('qr-payments')}
-                title="View QR Payments"
-                className={`px-3 sm:px-4 py-2 text-xs font-semibold rounded transition-all duration-200 ease-in-out transform whitespace-nowrap ${activeTab === 'qr-payments'
-                    ? 'bg-red-600 text-white scale-105 shadow-sm'
-                    : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700 hover:scale-[1.02]'
+          <div
+            className={`mb-3 rounded-xl bg-gray-200/80 dark:bg-slate-800/90 p-1 grid gap-1 ${
+              features.qrPayment ? 'grid-cols-2' : 'grid-cols-3'
+            } sm:flex sm:flex-wrap sm:gap-2 sm:p-0 sm:bg-transparent sm:rounded-none`}
+          >
+            {[
+              { id: 'payments', label: 'Payments', mobileLabel: 'Payments' },
+              { id: 'fund-transfers', label: 'Fund Transfers', mobileLabel: 'Transfers' },
+              { id: 'bank-registrations', label: 'Bank Registrations', mobileLabel: 'Bank Reg.' },
+              ...(features.qrPayment ? [{ id: 'qr-payments', label: 'QR Payments', mobileLabel: 'QR Pay' }] : []),
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  title={`View ${tab.label}`}
+                  className={`flex items-center justify-center min-h-10 px-2 py-2 text-xs font-semibold rounded-lg transition-all text-center ${
+                    isActive
+                      ? 'bg-white dark:bg-slate-900 text-red-600 shadow-sm sm:bg-red-600 sm:text-white'
+                      : 'text-gray-600 dark:text-slate-400 sm:bg-gray-100 sm:dark:bg-slate-800 sm:hover:bg-gray-200 sm:dark:hover:bg-slate-700'
                   }`}
-              >
-                QR Payments
-              </button>
-            )}
+                >
+                  <span className="sm:hidden">{tab.mobileLabel}</span>
+                  <span className="hidden sm:inline">{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
@@ -2419,7 +2467,167 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-        <div className="overflow-x-auto relative">
+
+        {/* Mobile transaction cards */}
+        <div className="md:hidden divide-y divide-slate-200 dark:divide-slate-700/50">
+          {tableLoading ? (
+            <div className="px-3 py-12 flex justify-center">
+              <AppLoading size="md" text="Loading..." />
+            </div>
+          ) : activeTab === 'payments' ? (
+            payments.length === 0 ? (
+              <div className="px-3 py-8 text-center text-sm text-slate-600 dark:text-slate-500">No transactions found</div>
+            ) : (
+              payments.map((payment, index) => {
+                const dateTime = formatTransactionDateTime(payment.createdAt);
+                const rowNumber = ((pagination.page - 1) * pagination.limit) + index + 1;
+                const statusStyle = getTableStatusStyle(payment.status);
+                const ref = payment.ref || payment.ref1 || '-';
+                const memberName = payment.member?.name || '-';
+                return (
+                  <div key={payment.id} className="px-3 py-3">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNumber}</div>
+                        <div className="font-mono text-base font-medium text-slate-900 dark:text-white break-all">{ref}</div>
+                      </div>
+                      <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
+                        {payment.status}
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-sm">
+                      {renderMobileField('Trans ID', payment.txnNumber || '-', { mono: true, breakAll: true })}
+                      {renderMobileField('Bank', `${payment.bankName || '-'} (${payment.bankCode || '-'})`)}
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="shrink-0 text-gray-500 dark:text-slate-400">Member</span>
+                        <div className="text-right min-w-0">
+                          <div className="font-sans whitespace-nowrap overflow-x-auto text-slate-800 dark:text-slate-200">{memberName}</div>
+                          {payment.member?.citizenId ? (
+                            <div className="font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{payment.member.citizenId}</div>
+                          ) : null}
+                        </div>
+                      </div>
+                      {renderMobileField('Amount', formatThaiBaht(payment.amount), { mono: true, bold: true })}
+                      {renderMobileField('Created', `${dateTime.dateShort} ${dateTime.time}`, { mono: true })}
+                    </div>
+                  </div>
+                );
+              })
+            )
+          ) : activeTab === 'fund-transfers' ? (
+            fundTransfers.length === 0 ? (
+              <div className="px-3 py-8 text-center text-sm text-slate-600 dark:text-slate-500">No fund transfers found</div>
+            ) : (
+              fundTransfers.map((transfer, index) => {
+                const dateTimeValue = transfer.createdAt || transfer.requestDateTime;
+                const dateTime = formatTransactionDateTime(dateTimeValue);
+                const rowNumber = ((fundTransferPagination.page - 1) * fundTransferPagination.limit) + index + 1;
+                const status = transfer.transferStatus || transfer.inquiryStatus || 'UNKNOWN';
+                const statusStyle = getTableStatusStyle(status);
+                const memberName = transfer.member?.name || '-';
+                return (
+                  <div key={transfer.id} className="px-3 py-3">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNumber}</div>
+                        <div className="font-mono text-base font-medium text-slate-900 dark:text-white break-all">{transfer.ref1 || '-'}</div>
+                      </div>
+                      <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
+                        {status}
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-sm">
+                      {renderMobileField('Trans ID', transfer.rsTransID || '-', { mono: true, breakAll: true })}
+                      {renderMobileField('Bank', `${transfer.serviceBankName || '-'} (${transfer.serviceBankCode || '-'})`)}
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="shrink-0 text-gray-500 dark:text-slate-400">Member</span>
+                        <div className="text-right min-w-0">
+                          <div className="font-sans whitespace-nowrap overflow-x-auto text-slate-800 dark:text-slate-200">{memberName}</div>
+                          {transfer.member?.citizenId ? (
+                            <div className="font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{transfer.member.citizenId}</div>
+                          ) : null}
+                        </div>
+                      </div>
+                      {renderMobileField('Accounts', `${transfer.fromAccountNo || '-'} → ${transfer.toAccountNo || '-'}`, { mono: true, breakAll: true })}
+                      {renderMobileField('Amount', formatThaiBaht(transfer.amount), { mono: true, bold: true })}
+                      {renderMobileField('Created', `${dateTime.dateShort} ${dateTime.time}`, { mono: true })}
+                    </div>
+                  </div>
+                );
+              })
+            )
+          ) : activeTab === 'bank-registrations' ? (
+            bankRegistrations.length === 0 ? (
+              <div className="px-3 py-8 text-center text-sm text-slate-600 dark:text-slate-500">No registrations found</div>
+            ) : (
+              bankRegistrations.map((registration, index) => {
+                const dateTime = formatTransactionDateTime(registration.createdAt);
+                const rowNumber = ((bankRegistrationPagination.page - 1) * bankRegistrationPagination.limit) + index + 1;
+                const statusStyle = getRegistrationStatusStyle(registration.status);
+                const memberName = registration.member?.name || '-';
+                return (
+                  <div key={registration.id} className="px-3 py-3">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNumber}</div>
+                        <div className="font-mono text-base font-medium text-slate-900 dark:text-white break-all">{registration.regRef || '-'}</div>
+                      </div>
+                      <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
+                        {registration.status || '-'}
+                      </span>
+                    </div>
+                    <div className="space-y-1.5 text-sm">
+                      {renderMobileField('Bank', `${registration.bankName || '-'} (${registration.bankCode || '-'})`)}
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="shrink-0 text-gray-500 dark:text-slate-400">Member</span>
+                        <div className="text-right min-w-0">
+                          <div className="font-sans whitespace-nowrap overflow-x-auto text-slate-800 dark:text-slate-200">{memberName}</div>
+                          {registration.member?.citizenId ? (
+                            <div className="font-mono text-slate-500 dark:text-slate-400 whitespace-nowrap">{registration.member.citizenId}</div>
+                          ) : null}
+                        </div>
+                      </div>
+                      {renderMobileField('Created', `${dateTime.dateShort} ${dateTime.time}`, { mono: true })}
+                    </div>
+                  </div>
+                );
+              })
+            )
+          ) : qrPayments.length === 0 ? (
+            <div className="px-3 py-8 text-center text-sm text-slate-600 dark:text-slate-500">No QR payments found</div>
+          ) : (
+            qrPayments.map((qrPayment, index) => {
+              const dateTime = formatTransactionDateTime(qrPayment.createdAt);
+              const rowNumber = ((qrPaymentPagination.page - 1) * qrPaymentPagination.limit) + index + 1;
+              const statusStyle = getQrStatusStyle(qrPayment.status);
+              return (
+                <div
+                  key={qrPayment.id}
+                  className="px-3 py-3 cursor-pointer"
+                  onClick={() => setSelectedQrPaymentId(qrPayment.id)}
+                >
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNumber}</div>
+                      <div className="font-mono text-base font-medium text-slate-900 dark:text-white break-all">{qrPayment.ref1 || '-'}</div>
+                    </div>
+                    <span className={`shrink-0 px-2 py-0.5 rounded text-[10px] font-bold border ${statusStyle.bg} ${statusStyle.text} ${statusStyle.border}`}>
+                      {qrPayment.status || '-'}
+                    </span>
+                  </div>
+                  <div className="space-y-1.5 text-sm">
+                    {renderMobileField('Ref2', qrPayment.ref2 || '-', { mono: true, breakAll: true })}
+                    {renderMobileField('Internal Ref', qrPayment.internalRef || '-', { mono: true, breakAll: true })}
+                    {renderMobileField('Amount', formatThaiBaht(qrPayment.amountInBaht), { mono: true, bold: true })}
+                    {renderMobileField('Created', `${dateTime.dateShort} ${dateTime.time}`, { mono: true })}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="hidden md:block overflow-x-auto relative">
           <div>
             {activeTab === 'payments' ? (
               <table className="w-full text-left text-xs">
@@ -2431,7 +2639,7 @@ const Dashboard = () => {
                     <th className="px-2 sm:px-5 py-2 font-semibold">Ref</th>
                     <th className="px-5 py-2 font-semibold">Trans ID</th>
                     <th className="px-5 py-2 font-semibold">Bank</th>
-                    <th className="px-5 py-2 font-semibold">Member</th>
+                    <th className="px-2 sm:px-5 py-2 font-semibold whitespace-nowrap">Member</th>
                     <th className="px-5 py-2 font-semibold text-right">Amount</th>
                     <th className="px-5 py-2 font-semibold text-center">Status</th>
                   </tr>
@@ -2488,10 +2696,7 @@ const Dashboard = () => {
                             <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.bankName}</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{payment.bankCode}</div>
                           </td>
-                          <td className="px-5 py-3">
-                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{payment.member?.name || '-'}</div>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{payment.member?.citizenId || ''}</div>
-                          </td>
+                          {renderMemberCell(payment.member)}
                           <td className="px-5 py-3 text-right text-slate-900 dark:text-white font-bold font-mono transition-colors">
                             {formatThaiBaht(payment.amount)}
                           </td>
@@ -2519,7 +2724,7 @@ const Dashboard = () => {
                     <th className="px-2 sm:px-5 py-2 font-semibold">Ref</th>
                     <th className="px-5 py-2 font-semibold">Trans ID</th>
                     <th className="px-5 py-2 font-semibold">Bank</th>
-                    <th className="px-5 py-2 font-semibold">Member</th>
+                    <th className="px-2 sm:px-5 py-2 font-semibold whitespace-nowrap">Member</th>
                     <th className="px-5 py-2 font-semibold">From / To</th>
                     <th className="px-5 py-2 font-semibold text-right">Amount</th>
                     <th className="px-5 py-2 font-semibold text-center">Status</th>
@@ -2580,10 +2785,7 @@ const Dashboard = () => {
                             <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.serviceBankName || '-'}</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{transfer.serviceBankCode || ''}</div>
                           </td>
-                          <td className="px-5 py-3">
-                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.member?.name || '-'}</div>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{transfer.member?.citizenId || ''}</div>
-                          </td>
+                          {renderMemberCell(transfer.member)}
                           <td className="px-5 py-3">
                             <div className="text-slate-800 dark:text-slate-300 transition-colors">{transfer.fromAccountNo || '-'}</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">→ {transfer.toAccountNo || '-'}</div>
@@ -2612,7 +2814,7 @@ const Dashboard = () => {
                     <th className="px-2 py-2 font-semibold text-center w-16">No.</th>
                     <th className="px-2 sm:px-5 py-2 font-semibold">Reg Ref</th>
                     <th className="px-2 sm:px-5 py-2 font-semibold">Bank</th>
-                    <th className="px-2 sm:px-5 py-2 font-semibold">Member</th>
+                    <th className="px-2 sm:px-5 py-2 font-semibold whitespace-nowrap">Member</th>
                     <th className="px-2 sm:px-5 py-2 font-semibold whitespace-nowrap">Date</th>
                     <th className="px-2 sm:px-5 py-2 font-semibold whitespace-nowrap">Time</th>
                     <th className="px-5 py-2 font-semibold text-center">Status</th>
@@ -2665,10 +2867,7 @@ const Dashboard = () => {
                             <div className="text-slate-800 dark:text-slate-300 transition-colors">{registration.bankName || '-'}</div>
                             <div className="text-[10px] text-slate-500 dark:text-slate-400 transition-colors">{registration.bankCode || '-'}</div>
                           </td>
-                          <td className="px-2 sm:px-5 py-3">
-                            <div className="text-slate-800 dark:text-slate-300 transition-colors">{registration.member?.name || '-'}</div>
-                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono transition-colors">{registration.member?.citizenId || '-'}</div>
-                          </td>
+                          {renderMemberCell(registration.member)}
                           {renderTransactionDateCell(registration.createdAt)}
                           {renderTransactionTimeCell(registration.createdAt)}
                           <td className="px-5 py-3 text-center">

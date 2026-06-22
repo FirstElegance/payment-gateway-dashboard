@@ -168,21 +168,26 @@ const PaymentsList = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return { date: '-', time: '-' };
+    if (!dateString) return { date: '-', time: '-', dateShort: '-' };
     try {
       const date = new Date(dateString);
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const day = date.getDate();
       const month = months[date.getMonth()];
       const year = date.getFullYear();
-      const dateStr = `${day} ${month} ${year}`;
+      const dd = String(day).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yy = String(year).slice(-2);
       const hours = String(date.getHours()).padStart(2, '0');
       const minutes = String(date.getMinutes()).padStart(2, '0');
       const seconds = String(date.getSeconds()).padStart(2, '0');
-      const timeStr = `${hours}:${minutes}:${seconds}`;
-      return { date: dateStr, time: timeStr };
+      return {
+        date: `${day} ${month} ${year}`,
+        dateShort: `${dd}/${mm}/${yy}`,
+        time: `${hours}:${minutes}:${seconds}`,
+      };
     } catch {
-      return { date: dateString, time: '' };
+      return { date: dateString, time: '', dateShort: dateString };
     }
   };
 
@@ -470,56 +475,119 @@ const PaymentsList = () => {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              {/* Mobile cards */}
+              <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-800">
+                {payments.map((payment, index) => {
+                  const dateTime = formatDate(payment.createdAt);
+                  const rowNum = (pagination.page - 1) * pagination.limit + index + 1;
+                  const ref = payment.ref || payment.ref1 || '-';
+                  const transId = payment.txnNumber || '-';
+                  const memberName = payment.member?.name || '-';
+                  const amount = formatThaiBaht(payment.amount);
+
+                  return (
+                    <div
+                      key={payment.id}
+                      className="px-3 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors"
+                      onClick={() => setSelectedPaymentId(payment.id)}
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[11px] text-gray-500 dark:text-slate-400 mb-1">#{rowNum}</div>
+                          <div className="font-mono text-base font-medium text-gray-900 dark:text-white break-all">{ref}</div>
+                        </div>
+                        <span className={`shrink-0 inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(payment.status)}`}>
+                          {payment.status || '-'}
+                        </span>
+                      </div>
+                      <div className="space-y-1.5 text-sm">
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Trans ID</span>
+                          <span className="font-mono text-gray-900 dark:text-white text-right break-all">{transId}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Bank</span>
+                          <span className="text-gray-900 dark:text-white text-right whitespace-nowrap">
+                            {payment.bankName || '-'} <span className="text-gray-500 dark:text-slate-400">({payment.bankCode || '-'})</span>
+                          </span>
+                        </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Member</span>
+                          <div className="text-right min-w-0">
+                            <div className="font-sans text-gray-900 dark:text-white whitespace-nowrap overflow-x-auto" title={memberName}>{memberName}</div>
+                            {payment.member?.citizenId ? (
+                              <div className="font-mono text-gray-500 dark:text-slate-400 whitespace-nowrap">{payment.member.citizenId}</div>
+                            ) : null}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Amount</span>
+                          <span className="font-mono font-bold text-gray-900 dark:text-white whitespace-nowrap">{amount}</span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="shrink-0 text-gray-500 dark:text-slate-400">Created</span>
+                          <span className="font-mono text-gray-700 dark:text-slate-300 whitespace-nowrap">
+                            {dateTime.dateShort} {dateTime.time}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full min-w-[1100px] text-sm">
                   <thead className="bg-gray-50 dark:bg-slate-800/50 border-b border-gray-200 dark:border-slate-700 transition-colors">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">No.</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Ref</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Trans ID</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Bank</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Member</th>
-                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Amount</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Status</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors w-32">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider transition-colors">Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">No.</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Ref</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Trans ID</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Bank</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Member</th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Amount</th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 dark:divide-slate-800 transition-colors">
                     {payments.map((payment, index) => {
                       const dateTime = formatDate(payment.createdAt);
                       const rowNum = (pagination.page - 1) * pagination.limit + index + 1;
+                      const memberName = payment.member?.name || '-';
                       return (
                         <tr
                           key={payment.id}
                           className="hover:bg-gray-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer"
                           onClick={() => setSelectedPaymentId(payment.id)}
                         >
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors">{rowNum}</td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white transition-colors">{payment.ref || payment.ref1 || '-'}</div>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-nowrap">{rowNum}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white">{payment.ref || payment.ref1 || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white font-mono text-xs transition-colors">{payment.txnNumber || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-mono text-xs">{payment.txnNumber || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white transition-colors">{payment.bankName || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 transition-colors">{payment.bankCode || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white">{payment.bankName || '-'}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500">{payment.bankCode || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
-                            <div className="text-gray-900 dark:text-white transition-colors">{payment.member?.name || '-'}</div>
-                            <div className="text-xs text-gray-500 dark:text-slate-500 font-mono transition-colors">{payment.member?.citizenId || '-'}</div>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-sans whitespace-nowrap" title={memberName}>{memberName}</div>
+                            <div className="text-sm text-gray-500 dark:text-slate-500 font-mono whitespace-nowrap">{payment.member?.citizenId || '-'}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm text-right">
-                            <div className="text-gray-900 dark:text-white font-bold font-mono transition-colors">{formatThaiBaht(payment.amount)}</div>
+                          <td className="px-4 py-3 text-right whitespace-nowrap">
+                            <div className="text-gray-900 dark:text-white font-bold font-mono">{formatThaiBaht(payment.amount)}</div>
                           </td>
-                          <td className="px-4 py-3 text-sm">
+                          <td className="px-4 py-3 whitespace-nowrap">
                             <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getStatusColor(payment.status)}`}>
                               {payment.status || '-'}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-700 dark:text-slate-300 transition-colors whitespace-nowrap">{dateTime.date}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600 dark:text-slate-400 font-mono transition-colors">{dateTime.time}</td>
+                          <td className="px-4 py-3 text-gray-700 dark:text-slate-300 whitespace-nowrap">{dateTime.date}</td>
+                          <td className="px-4 py-3 text-gray-600 dark:text-slate-400 font-mono whitespace-nowrap">{dateTime.time}</td>
                         </tr>
                       );
                     })}

@@ -147,26 +147,85 @@ const TreasuryMonitor = () => {
           Refresh
         </button> */}
       </div>
-      <div className="overflow-x-auto">
-      <table className="w-full text-left text-xs table-fixed min-w-[500px]">
+
+      {/* Mobile: card layout */}
+      <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-700/50">
+        {!Array.isArray(bankInfo) || bankInfo.length === 0 ? (
+          <div className="px-3 py-4 text-center text-gray-500 dark:text-slate-500 text-xs transition-colors">
+            No bank info found
+          </div>
+        ) : (
+          bankInfo.map((bank) => {
+            const icon = getBankIcon(bank.bankCode);
+            const balance = formatThaiBaht(bank.netBalance);
+            const cashIn = formatThaiBaht(bank.importAmount || 0);
+            const cashOut = formatThaiBaht(bank.exportAmount || 0);
+
+            return (
+              <div key={`${bank.bankCode}-${bank.accountNo}`} className="px-3 py-3">
+                <div className="flex items-center gap-3 mb-3 min-w-0">
+                  {icon ? (
+                    <img
+                      src={icon}
+                      alt={bank.bankName}
+                      className="w-8 h-8 shrink-0 rounded object-contain"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 shrink-0 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400 transition-colors">
+                      {bank.bankCode}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <div className="font-bold text-gray-900 dark:text-slate-200 transition-colors truncate">{bank.bankName}</div>
+                    <div className="text-[10px] text-gray-500 dark:text-slate-500 font-mono transition-colors truncate">{bank.accountNo}</div>
+                  </div>
+                </div>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="shrink-0 text-gray-500 dark:text-slate-400">Balance</span>
+                    <span className="font-mono font-bold text-gray-900 dark:text-white text-right break-all" title={balance}>
+                      {balance}
+                    </span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="shrink-0 text-gray-500 dark:text-slate-400">Cash In</span>
+                    <span className="font-mono text-green-600 dark:text-green-400 text-right break-all" title={cashIn}>
+                      +{cashIn}
+                    </span>
+                  </div>
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="shrink-0 text-gray-500 dark:text-slate-400">Cash Out</span>
+                    <span className="font-mono text-red-600 dark:text-red-400 text-right break-all" title={cashOut}>
+                      -{cashOut}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop: table layout */}
+      <div className="hidden md:block overflow-x-auto">
+      <table className="w-full text-left text-xs table-fixed min-w-[640px]">
         <colgroup>
-          <col className="w-[35%]" />
-          <col className="w-[20%]" />
-          <col className="w-[25%]" />
-          {/* <col className="w-[20%]" /> */}
+          <col className="w-[38%]" />
+          <col className="w-[31%]" />
+          <col className="w-[31%]" />
         </colgroup>
         <thead className="bg-gray-50 dark:bg-slate-900/50 text-gray-600 dark:text-slate-500 transition-colors">
           <tr>
-            <th className="px-5 py-2 font-semibold text-left">Bank / Account</th>
-            <th className="px-5 py-2 font-semibold text-right">Balance (THB)</th>
-            <th className="px-5 py-2 font-semibold text-right">Today's Mov.</th>
+            <th className="px-3 lg:px-5 py-2 font-semibold text-left">Bank / Account</th>
+            <th className="px-3 lg:px-5 py-2 font-semibold text-right">Balance (THB)</th>
+            <th className="px-3 lg:px-5 py-2 font-semibold text-right">Today's Mov.</th>
             {/* <th className="px-5 py-2 font-semibold text-right">Usage</th> */}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50 text-gray-700 dark:text-slate-300 transition-colors">
           {!Array.isArray(bankInfo) || bankInfo.length === 0 ? (
             <tr>
-              <td colSpan="4" className="px-5 py-4 text-center text-gray-500 dark:text-slate-500 transition-colors">
+              <td colSpan="3" className="px-5 py-4 text-center text-gray-500 dark:text-slate-500 transition-colors">
                 No bank info found
               </td>
             </tr>
@@ -178,36 +237,49 @@ const TreasuryMonitor = () => {
 
               return (
                 <tr key={`${bank.bankCode}-${bank.accountNo}`} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="px-5 py-3">
-                    <div className="flex items-center gap-3">
+                  <td className="px-3 lg:px-5 py-3 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0">
                       {icon ? (
                         <img 
                           src={icon} 
                           alt={bank.bankName} 
-                          className="w-8 h-8 rounded object-contain"
+                          className="w-8 h-8 shrink-0 rounded object-contain"
                         />
                       ) : (
-                        <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400 transition-colors">
+                        <div className="w-8 h-8 shrink-0 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400 transition-colors">
                           {bank.bankCode}
                       </div>
                       )}
-                      <div>
-                        <div className="font-bold text-gray-900 dark:text-slate-200 transition-colors">{bank.bankName}</div>
-                        <div className="text-[10px] text-gray-500 dark:text-slate-500 font-mono transition-colors">
+                      <div className="min-w-0">
+                        <div className="font-bold text-gray-900 dark:text-slate-200 transition-colors truncate">{bank.bankName}</div>
+                        <div className="text-[10px] text-gray-500 dark:text-slate-500 font-mono transition-colors truncate">
                           {bank.accountNo}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-right">
-                    <div className="font-mono font-bold text-gray-900 dark:text-white text-sm transition-colors">
-                    {formatThaiBaht(bank.netBalance)}
+                  <td className="px-3 lg:px-5 py-3 text-right min-w-0">
+                    <div
+                      className="font-mono font-bold text-gray-900 dark:text-white text-sm transition-colors truncate"
+                      title={formatThaiBaht(bank.netBalance)}
+                    >
+                      {formatThaiBaht(bank.netBalance)}
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-right">
-                    <div className="font-mono flex flex-col items-end gap-0.5">
-                      <span className="text-green-600 dark:text-green-400 transition-colors">+{formatThaiBaht(bank.importAmount || 0)}</span>
-                      <span className="text-red-600 dark:text-red-400 text-[10px] transition-colors">-{formatThaiBaht(bank.exportAmount || 0)}</span>
+                  <td className="px-3 lg:px-5 py-3 text-right min-w-0">
+                    <div className="font-mono flex flex-col items-end gap-0.5 min-w-0">
+                      <span
+                        className="text-green-600 dark:text-green-400 transition-colors truncate max-w-full"
+                        title={formatThaiBaht(bank.importAmount || 0)}
+                      >
+                        +{formatThaiBaht(bank.importAmount || 0)}
+                      </span>
+                      <span
+                        className="text-red-600 dark:text-red-400 text-[10px] transition-colors truncate max-w-full"
+                        title={formatThaiBaht(bank.exportAmount || 0)}
+                      >
+                        -{formatThaiBaht(bank.exportAmount || 0)}
+                      </span>
                     </div>
                   </td>
                   {/* <td className="px-5 py-3 text-right">
