@@ -39,6 +39,8 @@ const normalizeSelectedPortal = (portal) => ({
   merchant: portal.merchant,
   vitePaymentUrl: portal.vitePaymentUrl,
   vitePaymentToken: portal.vitePaymentToken,
+  environment: portal.environment,
+  isActive: portal.isActive,
 });
 
 export const getLoginPath = (loginType) =>
@@ -107,12 +109,16 @@ export const AuthProvider = ({ children }) => {
       try {
         const data = await portalBankingAPI.getAll();
         const list = Array.isArray(data) ? data : [];
-        const stillExists = list.some(
+        const matched = list.find(
           (portal) => String(portal.id) === String(selectedPortal.id),
         );
 
-        if (list.length > 0 && !stillExists && !cancelled) {
+        if (list.length > 0 && (!matched || matched.isActive === false) && !cancelled) {
           clearSelectedPortal();
+        } else if (matched && !cancelled) {
+          const updated = normalizeSelectedPortal(matched);
+          setSelectedPortal(updated);
+          localStorage.setItem(SELECTED_PORTAL_KEY, JSON.stringify(updated));
         }
       } catch (err) {
         console.error('Error validating selected portal:', err);
