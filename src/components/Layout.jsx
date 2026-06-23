@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Settings, Home, LogOut, User, FileText, Wallet, ArrowLeftRight, Sun, Moon, QrCode, Users, Menu, X, RefreshCw, ChevronDown, CreditCard, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Settings, Home, LogOut, User, FileText, Wallet, ArrowLeftRight, Sun, Moon, QrCode, Users, Menu, X, RefreshCw, ChevronDown, CreditCard, PanelLeftClose, PanelLeftOpen, ArrowLeft, Building2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useFeatures } from '../contexts/FeatureContext';
@@ -11,10 +11,10 @@ import { bankConfigAPI, transferConfigAPI } from '../services/api';
  * Layout Component with Navbar
  * Layout หลักที่มี Navbar สำหรับเลือกเมนู
  */
-const Layout = ({ children }) => {
+const Layout = ({ children, superAdminShell = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, selectedPortal, isSuperAdmin, exitPortal } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const { features } = useFeatures();
   const { intervalSeconds, setIntervalSeconds, isActive: isAutoRefreshActive } = useAutoRefresh();
@@ -38,6 +38,8 @@ const Layout = ({ children }) => {
 
   // Load profile name and business config
   useEffect(() => {
+    if (superAdminShell) return;
+
     const loadProfileName = async () => {
       try {
         const response = await bankConfigAPI.getProfileName();
@@ -69,7 +71,10 @@ const Layout = ({ children }) => {
     loadBusinessConfig();
     loadActiveBanks();
     loadAllConfigs();
-  }, []);
+  }, [selectedPortal?.id, superAdminShell]);
+
+  const homePath = superAdminShell ? '/superadmin/portal-banking' : '/';
+  const tickerLabel = superAdminShell ? (user?.username || 'SUPER ADMIN') : profileName;
 
   const getBankIconPath = (bankCode) => {
     const bankIconMap = { '004': 'KBANK', '014': 'SCB', '002': 'BBL', '025': 'BAY' };
@@ -86,7 +91,15 @@ const Layout = ({ children }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [autoRefreshDropdownOpen]);
 
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => {
+    const loginPath = logout();
+    navigate(loginPath);
+  };
+
+  const handleSwitchMerchant = () => {
+    exitPortal();
+    navigate('/superadmin/portal-banking');
+  };
   const isActive = (path) => location.pathname === path;
 
   // Nav items - filter based on features
@@ -101,8 +114,14 @@ const Layout = ({ children }) => {
     { path: '/bank-configs', label: 'Configurations', icon: Settings },
   ];
 
+  const superAdminNavItems = [
+    { path: '/superadmin/portal-banking', label: 'Portal Banking', icon: Building2 },
+  ];
+
   // Filter nav items based on features and configs
-  const navItems = allNavItems.filter(item => {
+  const navItems = superAdminShell
+    ? superAdminNavItems
+    : allNavItems.filter(item => {
     // Check feature requirement
     if (item.requireFeature && features[item.requireFeature] !== true) return false;
     // Check config requirement (for wallet)
@@ -143,6 +162,25 @@ const Layout = ({ children }) => {
   const renderUserSection = (isMobile = false) => (
     user && (
       <div className={`border-t border-gray-200 dark:border-slate-800 p-2 space-y-1 ${(sidebarCollapsed && !isMobile) ? 'flex flex-col items-center' : ''}`}>
+        {selectedPortal && (!sidebarCollapsed || isMobile) && (
+          <div className="px-2 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-500/20">
+            <p className="text-[10px] uppercase tracking-wider text-red-600 dark:text-red-400 font-semibold">Merchant</p>
+            <p className="text-xs font-bold text-red-700 dark:text-red-300 uppercase truncate">
+              {selectedPortal.merchant}
+            </p>
+          </div>
+        )}
+        {isSuperAdmin && selectedPortal && (
+          <button
+            type="button"
+            onClick={handleSwitchMerchant}
+            title="Switch merchant"
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 cursor-pointer transition-colors ${(sidebarCollapsed && !isMobile) ? 'justify-center px-0' : ''}`}
+          >
+            <ArrowLeft className="w-4 h-4 flex-shrink-0" />
+            {(!sidebarCollapsed || isMobile) && <span>Switch Merchant</span>}
+          </button>
+        )}
         <div
           className={`flex items-center gap-2 w-full px-2 py-2 rounded-lg text-gray-700 dark:text-slate-300 ${(sidebarCollapsed && !isMobile) ? 'justify-center px-0' : ''}`}
           title={user.name || user.username}
@@ -172,7 +210,7 @@ const Layout = ({ children }) => {
       <aside className={`hidden md:flex flex-col ${sidebarWidth} bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 fixed inset-y-0 left-0 z-40 transition-all duration-300`}>
         <div className="h-12 flex items-center justify-between px-3 border-b border-gray-200 dark:border-slate-800 flex-shrink-0">
           {!sidebarCollapsed && (
-            <Link to="/" className="flex items-center gap-2" title="ELEGANCE Payment Gateway">
+            <Link to={homePath} className="flex items-center gap-2" title="ELEGANCE Payment Gateway">
               <img src="https://www.elegance.co.th/wp-content/uploads/2025/08/cropped-LogoEleganceSiteIcon-32x32.png" alt="ELEGANCE Logo" className="w-6 h-6 object-contain" />
               <div>
                 <h1 className="font-bold text-gray-900 dark:text-white tracking-tight leading-none text-xs transition-colors">ELEGANCE</h1>
@@ -198,7 +236,7 @@ const Layout = ({ children }) => {
           <div className="fixed inset-0 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
           <aside className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col z-50 shadow-xl">
             <div className="h-12 flex items-center justify-between px-4 border-b border-gray-200 dark:border-slate-800 flex-shrink-0">
-              <Link to="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+              <Link to={homePath} className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
                 <img src="https://www.elegance.co.th/wp-content/uploads/2025/08/cropped-LogoEleganceSiteIcon-32x32.png" alt="ELEGANCE Logo" className="w-6 h-6 object-contain" />
                 <div>
                   <h1 className="font-bold text-gray-900 dark:text-white tracking-tight leading-none text-sm">ELEGANCE</h1>
@@ -209,7 +247,14 @@ const Layout = ({ children }) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            {businessConfig && (
+            {superAdminShell ? (
+              <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-800 text-xs">
+                <div className="px-2 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold rounded text-xs">
+                  {tickerLabel}
+                </div>
+                <p className="text-gray-500 dark:text-slate-400 mt-2">Portal Banking Management</p>
+              </div>
+            ) : businessConfig && (
               <div className="px-4 py-3 border-b border-gray-200 dark:border-slate-800 space-y-1.5 text-xs">
                 <div className="px-2 py-1 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold rounded text-xs">{profileName}</div>
                 <div className="flex justify-between px-1">
@@ -245,7 +290,7 @@ const Layout = ({ children }) => {
               >
                 {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
               </button>
-              <Link to="/" className="flex items-center gap-1.5">
+              <Link to={homePath} className="flex items-center gap-1.5">
                 <img src="https://www.elegance.co.th/wp-content/uploads/2025/08/cropped-LogoEleganceSiteIcon-32x32.png" alt="ELEGANCE Logo" className="w-5 h-5 object-contain" />
                 <span className="font-bold text-gray-900 dark:text-white text-xs">ELEGANCE</span>
               </Link>
@@ -253,11 +298,15 @@ const Layout = ({ children }) => {
 
             {/* Desktop ticker */}
             <div className="hidden md:flex items-center flex-1 min-w-0 overflow-x-auto overflow-y-hidden h-full text-xs font-mono text-gray-500 dark:text-slate-400 whitespace-nowrap">
-              <div className="px-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold border-r border-gray-200 dark:border-slate-800 h-full flex items-center tracking-wider transition-colors" title="Profile name">
-                {profileName}
+              <div className="px-3 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold border-r border-gray-200 dark:border-slate-800 h-full flex items-center tracking-wider transition-colors" title={superAdminShell ? 'Super Admin' : 'Profile name'}>
+                {tickerLabel}
               </div>
               <div className="flex items-center px-3 gap-4">
-                {businessConfig && (
+                {superAdminShell ? (
+                  <span className="text-gray-600 dark:text-slate-300 font-medium">
+                    Portal Banking Management
+                  </span>
+                ) : businessConfig && (
                   <>
                     <span className="flex gap-1.5 text-gray-600 dark:text-slate-300" title="Environment">
                       <Settings className="w-3.5 h-3.5 mt-0.5" />

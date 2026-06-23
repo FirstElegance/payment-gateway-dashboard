@@ -5,6 +5,9 @@ import { FeatureProvider } from './contexts/FeatureContext';
 import { AutoRefreshProvider } from './contexts/AutoRefreshContext';
 import Layout from './components/Layout';
 import Login from './components/Login';
+import SuperAdminLogin from './components/SuperAdminLogin';
+import SuperAdminProtectedRoute from './components/SuperAdminProtectedRoute';
+import PortalBankingList from './components/PortalBankingList';
 import Register from './components/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './components/Dashboard';
@@ -30,7 +33,25 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/superadmin/login" element={<SuperAdminLogin />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Super Admin Routes */}
+          <Route
+            path="/superadmin/*"
+            element={
+              <SuperAdminProtectedRoute>
+                <AutoRefreshProvider>
+                <Layout superAdminShell>
+                  <Routes>
+                    <Route path="portal-banking" element={<PortalBankingList />} />
+                    <Route path="*" element={<Navigate to="/superadmin/portal-banking" replace />} />
+                  </Routes>
+                </Layout>
+                </AutoRefreshProvider>
+              </SuperAdminProtectedRoute>
+            }
+          />
           
           {/* Protected Routes */}
           <Route

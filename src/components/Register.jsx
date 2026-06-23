@@ -233,11 +233,11 @@ const Register = () => {
           </div>
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center transition-colors">
+          {/* <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 text-center transition-colors">
             <p className="text-xs text-slate-600 dark:text-slate-500 transition-colors">
               Protected by ELEGANCE Security
             </p>
-          </div>
+          </div> */}
         </div>
 
         {/* Additional Info */}
