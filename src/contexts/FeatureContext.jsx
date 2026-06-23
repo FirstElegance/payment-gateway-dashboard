@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { bankConfigAPI } from '../services/api';
+import { useAuth } from './AuthContext';
 
 /**
  * Feature Context
@@ -16,6 +17,7 @@ export const useFeatures = () => {
 };
 
 export const FeatureProvider = ({ children }) => {
+  const { selectedPortal } = useAuth();
   const [features, setFeatures] = useState({
     qrPayment: false,  // มี BILL_PAYMENT หรือไม่
   });
@@ -23,7 +25,7 @@ export const FeatureProvider = ({ children }) => {
 
   useEffect(() => {
     checkFeatures();
-  }, []);
+  }, [selectedPortal?.id]);
 
   const checkFeatures = async () => {
     try {

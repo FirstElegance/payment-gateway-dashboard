@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { getLoginPath, useAuth } from '../contexts/AuthContext';
 import AppLoading from './AppLoading';
 
 /**
@@ -7,9 +7,9 @@ import AppLoading from './AppLoading';
  * ป้องกัน routes ที่ต้อง login
  */
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isSuperAdmin, selectedPortal, loading, portalValidating } = useAuth();
 
-  if (loading) {
+  if (loading || portalValidating) {
     return (
       <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 transition-colors">
         <AppLoading size="lg" text="Loading..." />
@@ -18,7 +18,12 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    const loginType = localStorage.getItem('elegance_login_type');
+    return <Navigate to={getLoginPath(loginType)} replace />;
+  }
+
+  if (isSuperAdmin && !selectedPortal) {
+    return <Navigate to="/superadmin/portal-banking" replace />;
   }
 
   return children;

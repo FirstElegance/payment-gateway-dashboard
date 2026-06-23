@@ -20,15 +20,117 @@ const API_BASE_URL = import.meta.env.DEV
  */
 const DEFAULT_AUTH_TOKEN = import.meta.env.VITE_PAYMENT_TOKEN || "";
 
-const normalizeToken = (token) => {
+const normalizeBasicToken = (token) => {
   if (!token) return null;
-  return token.startsWith("Basic ") ? token : `Basic ${token}`;
+  const raw = token.replace(/^Basic\s+/i, "").trim();
+  return `Basic ${raw}`;
 };
 
-// ใช้ Basic token เดียวจาก .env
-const getAuthToken = () => {
-  return `Basic ${import.meta.env.VITE_PAYMENT_TOKEN}`;
+export const normalizeBearerToken = (token) => {
+  if (!token) return null;
+  const raw = token.replace(/^Bearer\s+/i, "").trim();
+  return `Bearer ${raw}`;
 };
+
+export const stripAuthScheme = (token) =>
+  (token || "").replace(/^(Basic|Bearer)\s+/i, "").trim();
+
+const LOGIN_TYPE_KEY = "elegance_login_type";
+const SESSION_TOKEN_KEY = "elegance_token";
+const USER_KEY = "elegance_user";
+const SUPER_ADMIN_ROLE = "Super-Admin";
+
+export const hasSuperAdminRole = (roles) => {
+  if (Array.isArray(roles)) {
+    return roles.includes(SUPER_ADMIN_ROLE);
+  }
+  return roles === SUPER_ADMIN_ROLE;
+};
+export const SELECTED_PORTAL_KEY = "elegance_selected_portal";
+const PORTAL_DEV_PREFIX = "/__portal__";
+
+const encodePortalDevPrefix = (merchantUrl) => {
+  const origin = normalizeBaseUrl(merchantUrl);
+  const encoded = btoa(origin)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+  return `${PORTAL_DEV_PREFIX}/${encoded}`;
+};
+
+export const getSelectedPortal = () => {
+  try {
+    const raw = localStorage.getItem(SELECTED_PORTAL_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+// ใช้ merchant ที่เลือกได้เฉพาะ session superadmin เท่านั้น
+const getActiveSelectedPortal = () => {
+  if (localStorage.getItem(LOGIN_TYPE_KEY) !== "superadmin") {
+    return null;
+  }
+  return getSelectedPortal();
+};
+
+// Portal dashboard ปกติ → .env | Super Admin เลือก merchant → URL/token จาก card
+const applyMerchantPortalConfig = (config, selected, requestUrl) => {
+  const merchantUrl = normalizeBaseUrl(selected.vitePaymentUrl);
+  const apiPath = requestUrl.startsWith("/") ? requestUrl : `/${requestUrl}`;
+
+  if (import.meta.env.DEV) {
+    config.baseURL = "";
+    config.url = `${encodePortalDevPrefix(merchantUrl)}${apiPath}`;
+  } else {
+    config.baseURL = merchantUrl;
+  }
+
+  if (selected.vitePaymentToken) {
+    config.headers.Authorization = normalizeBasicToken(selected.vitePaymentToken);
+  } else {
+    delete config.headers.Authorization;
+  }
+};
+
+const applyEnvPortalConfig = (config) => {
+  config.baseURL = API_BASE_URL;
+
+  const token = import.meta.env.VITE_PAYMENT_TOKEN;
+  if (token) {
+    config.headers.Authorization = normalizeBasicToken(token);
+  } else {
+    delete config.headers.Authorization;
+  }
+};
+
+// GET /portalbanking → Authorization: Bearer <token> จาก superadmin login
+const getSuperAdminBearerToken = () => {
+  const loginType = localStorage.getItem(LOGIN_TYPE_KEY);
+  const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
+
+  if (loginType !== "superadmin" || !sessionToken) {
+    return null;
+  }
+
+  try {
+    const user = JSON.parse(localStorage.getItem(USER_KEY) || "{}");
+    if (!hasSuperAdminRole(user.roles)) {
+      return null;
+    }
+  } catch {
+    return null;
+  }
+
+  return normalizeBearerToken(sessionToken);
+};
+
+const isPortalBankingRequest = (url = "") =>
+  url === "/portalbanking" || url.startsWith("/portalbanking/");
+
+const isAuthRequest = (url = "") =>
+  url === "/auth" || url.startsWith("/auth/");
 
 /**
  * ===============================
@@ -49,12 +151,32 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
+    const requestUrl = config.url || "";
 
-    if (token) {
-      config.headers.Authorization = token;
+    if (isPortalBankingRequest(requestUrl)) {
+      config.baseURL = API_BASE_URL;
+      const bearerToken = getSuperAdminBearerToken();
+      if (bearerToken) {
+        config.headers.Authorization = bearerToken;
+      } else {
+        delete config.headers.Authorization;
+      }
+      return config;
     }
 
+    // /auth/* ใช้ backend จาก .env เสมอ (superadmin login, register)
+    if (isAuthRequest(requestUrl)) {
+      applyEnvPortalConfig(config);
+      return config;
+    }
+
+    const selected = getActiveSelectedPortal();
+    if (selected?.vitePaymentUrl) {
+      applyMerchantPortalConfig(config, selected, requestUrl);
+      return config;
+    }
+
+    applyEnvPortalConfig(config);
     return config;
   },
   (error) => Promise.reject(error),
@@ -329,6 +451,24 @@ export const walletAPI = {
   getMerchantWithdrawals: async (merchantMemberId) =>
     (await apiClient.get(`/wallet/merchant/${merchantMemberId}/withdrawals`))
       .data,
+};
+
+/**
+ * ========================================================
+ * PORTAL BANKING API (Super Admin)
+ * ========================================================
+ */
+export const portalBankingAPI = {
+  getAll: async () => (await apiClient.get("/portalbanking")).data,
+
+  getById: async (id) => (await apiClient.get(`/portalbanking/${id}`)).data,
+
+  create: async (data) => (await apiClient.post("/portalbanking", data)).data,
+
+  update: async (id, data) =>
+    (await apiClient.put(`/portalbanking/${id}`, data)).data,
+
+  delete: async (id) => apiClient.delete(`/portalbanking/${id}`),
 };
 
 /**
